@@ -26,7 +26,7 @@ def save_profile(data: ProfileInput, authorization: str = Header(...)):
 
         supabase_admin.table("profiles").upsert({
             "user_id": user_id,
-            **data.dict()
+            **data.model_dump()
         }).execute()
 
         return {"success": True}
