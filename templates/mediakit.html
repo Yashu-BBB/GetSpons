@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>{{ creator_name }} — Media Kit</title>
+  <style>
+    /* ── Reset ─────────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    @page {
+      size: A4;
+      margin: 0;
+    }
+
+    body {
+      font-family: Georgia, "Times New Roman", serif;
+      background: #FFFFFF;
+      color: #1A1028;
+      font-size: 14px;           /* ↑ base raised from 10.5pt */
+      line-height: 1.7;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    /* ── Page wrapper ───────────────────────────────────────────── */
+    .page {
+      width: 210mm;
+      min-height: 297mm;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── HERO HEADER ────────────────────────────────────────────── */
+    .hero {
+      background: linear-gradient(135deg, #4B2A91 0%, #6C3FC7 55%, #8B5CF6 100%);
+      padding: 60px 60px 48px;   /* ↑ more breathing room */
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: "";
+      position: absolute;
+      top: -60px;
+      right: -60px;
+      width: 280px;
+      height: 280px;
+      border-radius: 50%;
+      border: 40px solid rgba(255,255,255,0.07);
+    }
+    .hero::after {
+      content: "";
+      position: absolute;
+      bottom: -40px;
+      right: 80px;
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      border: 24px solid rgba(255,255,255,0.05);
+    }
+
+    .hero-eyebrow {
+      font-family: "Courier New", Courier, monospace;
+      font-size: 11px;           /* ↑ was 8pt */
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: #F5C842;
+      margin-bottom: 18px;
+    }
+
+    .hero-name {
+      font-family: Georgia, serif;
+      font-size: 52px;           /* ↑ was 36pt — now solidly above 36px minimum */
+      font-weight: 700;
+      color: #FFFFFF;
+      line-height: 1.05;
+      letter-spacing: -0.01em;
+      margin-bottom: 12px;
+    }
+
+    .hero-handle {
+      font-family: "Courier New", Courier, monospace;
+      font-size: 16px;           /* ↑ was 12pt */
+      color: rgba(255,255,255,0.72);
+      letter-spacing: 0.04em;
+      margin-bottom: 28px;
+    }
+
+    .hero-headline {
+      font-family: Georgia, serif;
+      font-size: 17px;           /* ↑ was 13pt */
+      font-style: italic;
+      color: rgba(255,255,255,0.88);
+      max-width: 520px;
+      line-height: 1.6;
+      border-left: 3px solid #F5C842;
+      padding-left: 18px;
+    }
+
+    /* ── BODY ───────────────────────────────────────────────────── */
+    .body {
+      flex: 1;
+      padding: 52px 60px;        /* ↑ was 42px 52px */
+      display: flex;
+      flex-direction: column;
+      gap: 48px;                 /* ↑ was 36px — well above 30px minimum */
+    }
+
+    /* ── Section label ──────────────────────────────────────────── */
+    .section-label {
+      font-family: "Courier New", Courier, monospace;
+      font-size: 10px;           /* ↑ was 7.5pt */
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: #6C3FC7;
+      margin-bottom: 16px;       /* ↑ was 10px */
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .section-label::after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background: #D8D0F0;
+    }
+
+    /* ── KEY STATS GRID ─────────────────────────────────────────── */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 18px;                 /* ↑ was 14px */
+    }
+
+    .stat-card {
+      background: #F5F3FF;
+      border: 1.5px solid #D8D0F0;
+      border-radius: 12px;
+      padding: 26px 28px;        /* ↑ was 18px 20px — comfortably above 20px min */
+      position: relative;
+      overflow: hidden;
+    }
+    .stat-card::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 0;
+      width: 5px;
+      height: 100%;
+      background: linear-gradient(180deg, #4B2A91, #8B5CF6);
+      border-radius: 12px 0 0 12px;
+    }
+
+    .stat-value {
+      font-family: Georgia, serif;
+      font-size: 30px;           /* ↑ was 22pt */
+      font-weight: 700;
+      color: #4B2A91;
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+
+    .stat-label {
+      font-family: "Courier New", Courier, monospace;
+      font-size: 10px;           /* ↑ was 7.5pt */
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: #6E5F88;
+    }
+
+    /* ── TEXT SECTIONS ──────────────────────────────────────────── */
+    .text-block p {
+      color: #3D2E5A;
+      font-size: 14px;
+      line-height: 1.75;
+    }
+
+    /* ── TWO-COLUMN LAYOUT ──────────────────────────────────────── */
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 36px;                 /* ↑ was 28px */
+    }
+
+    /* ── WHY PARTNER ────────────────────────────────────────────── */
+    .why-box {
+      background: linear-gradient(135deg, #EDE9FF, #F0EBFF);
+      border: 1.5px solid #D8D0F0;
+      border-radius: 14px;
+      padding: 30px 32px;        /* ↑ was 24px 26px */
+    }
+    .why-box p {
+      color: #3D2E5A;
+      font-size: 14px;
+      line-height: 1.75;
+    }
+
+    /* ── PRICING TABLE ──────────────────────────────────────────── */
+    .pricing-table {
+      width: 100%;
+      border-collapse: collapse;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .pricing-table thead tr {
+      background: linear-gradient(90deg, #4B2A91, #6C3FC7);
+    }
+
+    .pricing-table thead th {
+      font-family: "Courier New", Courier, monospace;
+      font-size: 10px;           /* ↑ was 7.8pt */
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: #FFFFFF;
+      padding: 18px 20px;        /* ↑ was 12px 16px */
+      text-align: left;
+    }
+
+    .pricing-table tbody tr {
+      border-bottom: 1px solid #D8D0F0;
+    }
+    .pricing-table tbody tr:nth-child(even) {
+      background: #F5F3FF;
+    }
+    .pricing-table tbody tr:last-child {
+      border-bottom: none;
+    }
+
+    .pricing-table tbody td {
+      padding: 20px 20px;        /* ↑ was 13px 16px — taller rows */
+      color: #3D2E5A;
+      font-size: 14px;           /* ↑ was 10pt */
+      line-height: 1.55;
+      vertical-align: top;
+    }
+
+    .pricing-table tbody td:first-child {
+      font-family: Georgia, serif;
+      font-size: 15px;
+      font-weight: 700;
+      color: #1A1028;
+      white-space: nowrap;
+    }
+
+    .pricing-table tbody td:last-child {
+      font-family: Georgia, serif;
+      font-size: 15px;           /* ↑ was 11pt */
+      font-weight: 700;
+      color: #4B2A91;
+      white-space: nowrap;
+    }
+
+    /* ── CTA FOOTER ─────────────────────────────────────────────── */
+    .cta-section {
+      background: linear-gradient(135deg, #4B2A91 0%, #6C3FC7 100%);
+      margin-left: -60px;        /* matches body padding */
+      margin-right: -60px;
+      padding: 40px 60px;        /* ↑ was 32px 52px */
+      margin-top: auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 28px;
+    }
+
+    .cta-text {
+      font-family: Georgia, serif;
+      font-size: 17px;           /* ↑ was 14pt */
+      font-style: italic;
+      color: #FFFFFF;
+      line-height: 1.5;
+      max-width: 440px;
+    }
+
+    .cta-badge {
+      background: #F5C842;
+      color: #4B2A91;
+      font-family: "Courier New", Courier, monospace;
+      font-size: 10px;           /* ↑ was 7.5pt */
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      padding: 14px 24px;        /* ↑ was 10px 20px */
+      border-radius: 30px;
+      white-space: nowrap;
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <!-- ══ HERO ══════════════════════════════════════════════════════ -->
+  <header class="hero">
+    <div class="hero-eyebrow">Media Kit · {{ platform }}</div>
+    <div class="hero-name">{{ creator_name }}</div>
+    <div class="hero-handle">{{ handle }}</div>
+    <div class="hero-headline">{{ headline }}</div>
+  </header>
+
+  <!-- ══ BODY ══════════════════════════════════════════════════════ -->
+  <main class="body">
+
+    <!-- Key Stats -->
+    <section>
+      <div class="section-label">By the Numbers</div>
+      <div class="stats-grid">
+        {% for stat in key_stats %}
+        <div class="stat-card">
+          <div class="stat-value">{{ stat.value }}</div>
+          <div class="stat-label">{{ stat.label }}</div>
+        </div>
+        {% endfor %}
+      </div>
+    </section>
+
+    <!-- Bio + Audience (two columns) -->
+    <section class="two-col">
+      <div>
+        <div class="section-label">About</div>
+        <div class="text-block"><p>{{ bio_short }}</p></div>
+      </div>
+      <div>
+        <div class="section-label">Audience</div>
+        <div class="text-block"><p>{{ audience_description }}</p></div>
+      </div>
+    </section>
+
+    <!-- Content Style -->
+    <section>
+      <div class="section-label">Content Style</div>
+      <div class="text-block"><p>{{ content_style }}</p></div>
+    </section>
+
+    <!-- Why Partner -->
+    <section>
+      <div class="section-label">Why Partner With Me</div>
+      <div class="why-box">
+        <p>{{ why_partner }}</p>
+      </div>
+    </section>
+
+    <!-- Pricing Table -->
+    <section>
+      <div class="section-label">Collaboration Packages</div>
+      <table class="pricing-table">
+        <thead>
+          <tr>
+            <th>Package</th>
+            <th>Deliverables</th>
+            <th>Investment</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in pricing_table %}
+          <tr>
+            <td>{{ row.package }}</td>
+            <td>{{ row.deliverable }}</td>
+            <td>{{ row.price }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </section>
+
+    <!-- CTA -->
+    <div class="cta-section">
+      <div class="cta-text">{{ cta }}</div>
+      <div class="cta-badge">Let's Collaborate</div>
+    </div>
+
+  </main>
+</div>
+</body>
+</html>
