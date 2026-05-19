@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Setup Profile — getSpons</title>
+  <link rel="stylesheet" href="css/shared.css" />
+  <style>
+    body { background: var(--gray-50); display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 24px; }
+
+    .profile-card {
+      background: var(--white);
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius);
+      padding: 40px 36px;
+      width: 100%;
+      max-width: 600px;
+      box-shadow: var(--shadow-md);
+    }
+
+    .profile-header { margin-bottom: 28px; }
+    .profile-header h1 { font-size: 1.5rem; margin-bottom: 6px; }
+    .profile-header p  { font-size: 0.88rem; color: var(--gray-500); }
+
+    .form-grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .form-section-title {
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--purple);
+      margin: 24px 0 14px;
+    }
+
+    /* Sponsors tag input */
+    .tags-wrapper {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      padding: 8px 10px;
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius-sm);
+      background: var(--white);
+      min-height: 46px;
+      cursor: text;
+      transition: border-color 0.2s;
+    }
+    .tags-wrapper:focus-within { border-color: var(--purple); box-shadow: 0 0 0 3px var(--purple-light); }
+
+    .tag-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: var(--purple-light);
+      color: var(--purple-dark);
+      font-size: 0.78rem;
+      font-weight: 600;
+      padding: 3px 9px;
+      border-radius: 999px;
+    }
+    .tag-remove { cursor: pointer; font-size: 0.9rem; line-height: 1; background: none; border: none; color: var(--purple-dark); }
+
+    #sponsorInput {
+      border: none;
+      outline: none;
+      font-size: 0.88rem;
+      font-family: inherit;
+      flex: 1;
+      min-width: 120px;
+      background: transparent;
+      color: var(--gray-900);
+    }
+    #sponsorInput::placeholder { color: var(--gray-300); }
+
+    @media (max-width: 520px) {
+      .form-grid-2 { grid-template-columns: 1fr; }
+      .profile-card { padding: 28px 20px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="profile-card">
+    <div class="profile-header">
+      <h1>Set Up Your Profile</h1>
+      <p>This powers your Media Kit and helps brands find you. Takes 2 minutes.</p>
+    </div>
+
+    <div class="alert" id="alertBox"></div>
+
+    <form id="profileForm">
+
+      <div class="form-section-title">Basic Info</div>
+      <div class="form-grid-2">
+        <div class="form-group">
+          <label class="form-label" for="full_name">Full Name</label>
+          <input class="form-input" type="text" id="full_name" placeholder="Ananya Kulkarni" required />
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="platform">Platform</label>
+          <select class="form-select" id="platform" required>
+            <option value="">Select platform</option>
+            <option value="Instagram">Instagram</option>
+            <option value="YouTube">YouTube</option>
+            <option value="Twitter">Twitter / X</option>
+            <option value="LinkedIn">LinkedIn</option>
+            <option value="TikTok">TikTok</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-grid-2" style="margin-top:16px">
+        <div class="form-group">
+          <label class="form-label" for="handle">Handle / Username</label>
+          <input class="form-input" type="text" id="handle" placeholder="@ananya.creates" required />
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="niche">Content Niche</label>
+          <select class="form-select" id="niche" required>
+            <option value="">Select niche</option>
+            <option>Beauty & Skincare</option>
+            <option>Tech & Gadgets</option>
+            <option>Food & Cooking</option>
+            <option>Fitness & Health</option>
+            <option>Finance & Investing</option>
+            <option>Travel & Lifestyle</option>
+            <option>Gaming</option>
+            <option>Fashion</option>
+            <option>Parenting</option>
+            <option>Education</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-section-title">Audience Stats</div>
+      <div class="form-grid-2">
+        <div class="form-group">
+          <label class="form-label" for="followers">Followers / Subscribers</label>
+          <input class="form-input" type="number" id="followers" placeholder="42000" min="0" required />
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="engagement_rate">Engagement Rate (%)</label>
+          <input class="form-input" type="number" id="engagement_rate" placeholder="6.5" min="0" max="100" step="0.1" required />
+          <span class="form-hint">Avg. likes+comments ÷ followers × 100</span>
+        </div>
+      </div>
+
+      <div class="form-section-title">Sponsorship Details</div>
+      <div class="form-grid-2">
+        <div class="form-group">
+          <label class="form-label" for="pricing_min">Min. Rate (₹)</label>
+          <input class="form-input" type="number" id="pricing_min" placeholder="5000" min="0" required />
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="pricing_max">Max. Rate (₹)</label>
+          <input class="form-input" type="number" id="pricing_max" placeholder="25000" min="0" required />
+        </div>
+      </div>
+
+      <div class="form-group" style="margin-top:16px">
+        <label class="form-label">Past Sponsors <span style="font-weight:400;color:var(--gray-500)">(optional)</span></label>
+        <div class="tags-wrapper" id="tagsWrapper" onclick="document.getElementById('sponsorInput').focus()">
+          <!-- Tags will appear here -->
+          <input type="text" id="sponsorInput" placeholder="Type a brand name, press Enter" />
+        </div>
+        <span class="form-hint">e.g. Mamaearth, boAt, Nykaa</span>
+      </div>
+
+      <div class="form-group" style="margin-top:16px">
+        <label class="form-label" for="bio">Short Bio</label>
+        <textarea class="form-textarea" id="bio" placeholder="Tell brands who you are and what you do in 2–3 sentences…" required></textarea>
+      </div>
+
+      <hr class="divider" />
+
+      <button type="submit" class="btn btn-primary btn-full btn-lg" id="submitBtn">
+        Save & Continue →
+      </button>
+    </form>
+  </div>
+
+  <script type="module">
+    import { API, getToken } from './js/api.js';
+
+    // Guard — must be logged in
+    if (!getToken()) window.location.href = 'login.html';
+
+    const alertBox  = document.getElementById('alertBox');
+    const submitBtn = document.getElementById('submitBtn');
+
+    // ── Tag (past sponsors) input logic ──────────────────────────────
+    let sponsors = [];
+
+    function renderTags() {
+      // Remove existing tag elements (keep the input)
+      document.querySelectorAll('.tag-item').forEach(t => t.remove());
+      const input = document.getElementById('sponsorInput');
+      const wrapper = document.getElementById('tagsWrapper');
+      sponsors.forEach((name, i) => {
+        const tag = document.createElement('span');
+        tag.className = 'tag-item';
+        tag.innerHTML = `${name} <button class="tag-remove" data-i="${i}" type="button">×</button>`;
+        wrapper.insertBefore(tag, input);
+      });
+    }
+
+    document.getElementById('tagsWrapper').addEventListener('click', e => {
+      if (e.target.classList.contains('tag-remove')) {
+        const i = parseInt(e.target.dataset.i);
+        sponsors.splice(i, 1);
+        renderTags();
+      }
+    });
+
+    document.getElementById('sponsorInput').addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ',') {
+        e.preventDefault();
+        const val = e.target.value.trim().replace(/,$/, '');
+        if (val && !sponsors.includes(val)) {
+          sponsors.push(val);
+          renderTags();
+        }
+        e.target.value = '';
+      }
+    });
+
+    // ── Pre-fill if profile already exists ───────────────────────────
+    try {
+      const profile = await API.getProfile();
+      if (profile) {
+        document.getElementById('full_name').value       = profile.full_name       || '';
+        document.getElementById('platform').value        = profile.platform        || '';
+        document.getElementById('handle').value          = profile.handle          || '';
+        document.getElementById('niche').value           = profile.niche           || '';
+        document.getElementById('followers').value       = profile.followers       || '';
+        document.getElementById('engagement_rate').value = profile.engagement_rate || '';
+        document.getElementById('pricing_min').value     = profile.pricing_min     || '';
+        document.getElementById('pricing_max').value     = profile.pricing_max     || '';
+        document.getElementById('bio').value             = profile.bio             || '';
+        sponsors = profile.past_sponsors || [];
+        renderTags();
+      }
+    } catch (_) {
+      // No profile yet — that's fine, form starts empty
+    }
+
+    // ── Form submit ───────────────────────────────────────────────────
+    document.getElementById('profileForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<span class="spinner"></span> Saving…';
+
+      // Build the payload matching backend ProfileInput model exactly
+      const payload = {
+        full_name:       document.getElementById('full_name').value.trim(),
+        platform:        document.getElementById('platform').value,
+        handle:          document.getElementById('handle').value.trim(),
+        followers:       parseInt(document.getElementById('followers').value),
+        niche:           document.getElementById('niche').value,
+        engagement_rate: parseFloat(document.getElementById('engagement_rate').value),
+        bio:             document.getElementById('bio').value.trim(),
+        past_sponsors:   sponsors,
+        pricing_min:     parseInt(document.getElementById('pricing_min').value),
+        pricing_max:     parseInt(document.getElementById('pricing_max').value),
+      };
+
+      try {
+        // POST /api/profile/save
+        await API.saveProfile(payload);
+
+        alertBox.textContent = '✅ Profile saved! Taking you to your dashboard…';
+        alertBox.className = 'alert alert-success show';
+        setTimeout(() => window.location.href = 'dashboard.html', 1200);
+
+      } catch (err) {
+        alertBox.textContent = err.message || 'Failed to save. Try again.';
+        alertBox.className = 'alert alert-error show';
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Save & Continue →';
+      }
+    });
+  </script>
+</body>
+</html>

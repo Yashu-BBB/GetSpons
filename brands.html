@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Find Brands — getSpons</title>
+  <link rel="stylesheet" href="css/shared.css" />
+  <style>
+    body { background: var(--gray-50); }
+
+    /* ── Filters bar ── */
+    .filters-bar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 24px;
+    }
+    .filter-label { font-size: 0.82rem; font-weight: 600; color: var(--gray-500); }
+
+    .niche-pills { display: flex; gap: 8px; flex-wrap: wrap; }
+    .niche-pill {
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      background: var(--white);
+      border: 1.5px solid var(--gray-200);
+      color: var(--gray-700);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .niche-pill:hover  { border-color: var(--purple); color: var(--purple); }
+    .niche-pill.active { background: var(--purple); border-color: var(--purple); color: #fff; }
+
+    /* ── Brand cards grid ── */
+    .brands-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 20px;
+    }
+
+    .brand-card {
+      background: var(--white);
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius);
+      padding: 22px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      transition: box-shadow 0.2s, transform 0.2s, border-color 0.2s;
+    }
+    .brand-card:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); border-color: var(--purple); }
+
+    .brand-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+    .brand-name   { font-size: 1rem; font-weight: 700; }
+    .brand-meta   { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 4px; }
+
+    .brand-detail { font-size: 0.82rem; color: var(--gray-500); }
+    .brand-detail span { color: var(--gray-700); font-weight: 500; }
+
+    .brand-website {
+      font-size: 0.78rem;
+      color: var(--purple);
+      font-weight: 500;
+    }
+    .brand-website:hover { text-decoration: underline; }
+
+    /* ── Pitch Modal ── */
+    .pitch-modal-header { margin-bottom: 16px; }
+    .pitch-brand-name   { font-size: 1.2rem; font-weight: 800; margin-bottom: 4px; }
+    .pitch-brand-sub    { font-size: 0.82rem; color: var(--gray-500); }
+
+    .pitch-subject-box {
+      background: var(--purple-light);
+      border-radius: var(--radius-sm);
+      padding: 12px 16px;
+      margin-bottom: 12px;
+    }
+    .pitch-subject-label { font-size: 0.7rem; font-weight: 700; color: var(--purple); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
+    .pitch-subject-text  { font-size: 0.88rem; font-weight: 600; color: var(--purple-dark); }
+
+    .pitch-body-box {
+      background: var(--gray-50);
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius-sm);
+      padding: 16px;
+      font-size: 0.85rem;
+      color: var(--gray-700);
+      line-height: 1.7;
+      white-space: pre-wrap;
+      max-height: 280px;
+      overflow-y: auto;
+      margin-bottom: 16px;
+    }
+
+    .pitch-actions { display: flex; gap: 10px; }
+
+    /* ── Status select (in modal) ── */
+    .status-select { font-size: 0.82rem; border: 1.5px solid var(--gray-200); border-radius: var(--radius-sm); padding: 6px 10px; }
+  </style>
+</head>
+<body class="has-mobile-nav">
+
+  <div class="page-wrapper">
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-logo">get<span>Spons</span></div>
+      <nav class="sidebar-nav">
+        <a href="dashboard.html" class="sidebar-link"><span class="icon">🏠</span> Dashboard</a>
+        <a href="brands.html"    class="sidebar-link active"><span class="icon">🏪</span> Find Brands</a>
+        <a href="pitches.html"   class="sidebar-link"><span class="icon">✉️</span> My Pitches</a>
+        <a href="profile.html"   class="sidebar-link"><span class="icon">👤</span> Edit Profile</a>
+      </nav>
+      <div class="sidebar-bottom">
+        <button class="btn btn-ghost btn-full btn-sm" id="logoutBtn">Log out</button>
+      </div>
+    </aside>
+
+    <!-- Main -->
+    <main class="main-content">
+      <h1 class="page-title">Find Brands</h1>
+      <p class="page-subtitle">30+ Indian D2C brands looking for micro-creators. Click "Pitch" to generate your AI email.</p>
+
+      <!-- Filters -->
+      <div class="filters-bar">
+        <span class="filter-label">Filter by niche:</span>
+        <div class="niche-pills" id="nichePills">
+          <button class="niche-pill active" data-niche="">All</button>
+          <button class="niche-pill" data-niche="Beauty">Beauty</button>
+          <button class="niche-pill" data-niche="Tech">Tech</button>
+          <button class="niche-pill" data-niche="Food">Food</button>
+          <button class="niche-pill" data-niche="Fitness">Fitness</button>
+          <button class="niche-pill" data-niche="Finance">Finance</button>
+          <button class="niche-pill" data-niche="Fashion">Fashion</button>
+          <button class="niche-pill" data-niche="Lifestyle">Lifestyle</button>
+        </div>
+      </div>
+
+      <!-- Alert -->
+      <div class="alert" id="alertBox" style="margin-bottom:16px"></div>
+
+      <!-- Brands grid -->
+      <div id="brandsGrid" class="brands-grid">
+        <!-- Loading skeletons -->
+        ${Array(6).fill('<div class="brand-card"><div class="skeleton" style="height:20px;width:60%;margin-bottom:12px"></div><div class="skeleton" style="height:14px;width:40%;margin-bottom:8px"></div><div class="skeleton" style="height:36px;margin-top:auto"></div></div>').join('')}
+      </div>
+    </main>
+  </div>
+
+  <!-- ── Pitch Modal ── -->
+  <div class="modal-backdrop" id="pitchModal">
+    <div class="modal">
+      <button class="modal-close" id="modalClose">✕</button>
+      <div class="pitch-modal-header">
+        <div class="pitch-brand-name" id="modalBrandName">Loading…</div>
+        <div class="pitch-brand-sub" id="modalBrandSub"></div>
+      </div>
+
+      <!-- Loading state -->
+      <div id="pitchLoading" style="text-align:center;padding:40px 0">
+        <span class="spinner spinner-purple" style="width:32px;height:32px;border-width:3px"></span>
+        <p style="margin-top:12px;font-size:0.88rem;color:var(--gray-500)">AI is writing your pitch…</p>
+      </div>
+
+      <!-- Pitch content (hidden until loaded) -->
+      <div id="pitchContent" style="display:none">
+        <div class="pitch-subject-box">
+          <div class="pitch-subject-label">Subject Line</div>
+          <div class="pitch-subject-text" id="pitchSubject"></div>
+        </div>
+        <div class="pitch-body-box" id="pitchBody"></div>
+        <div class="pitch-actions">
+          <button class="btn btn-primary" id="copyPitchBtn">📋 Copy Email</button>
+          <a class="btn btn-ghost" id="emailDirectBtn" href="#" target="_blank">✉️ Open in Gmail</a>
+        </div>
+      </div>
+
+      <!-- Error state -->
+      <div id="pitchError" style="display:none;text-align:center;padding:24px 0;color:var(--red)"></div>
+    </div>
+  </div>
+
+  <!-- Mobile nav -->
+  <nav class="mobile-nav">
+    <a href="dashboard.html"><span class="icon">🏠</span>Home</a>
+    <a href="brands.html" class="active"><span class="icon">🏪</span>Brands</a>
+    <a href="pitches.html"><span class="icon">✉️</span>Pitches</a>
+    <a href="profile.html"><span class="icon">👤</span>Profile</a>
+  </nav>
+
+  <script type="module">
+    import { API, getToken } from './js/api.js';
+
+    if (!getToken()) window.location.href = 'login.html';
+    document.getElementById('logoutBtn')?.addEventListener('click', () => API.logout());
+
+    let currentNiche = '';
+    let currentPitchId = null;
+
+    // ── Helpers ───────────────────────────────────────────────────────
+    function fmtFollowers(n) {
+      if (!n) return '—';
+      if (n >= 1e6) return (n/1e6).toFixed(1) + 'M+';
+      if (n >= 1000) return (n/1000).toFixed(0) + 'K+';
+      return n.toLocaleString();
+    }
+
+    // ── Render brands ─────────────────────────────────────────────────
+    function renderBrands(brands) {
+      const grid = document.getElementById('brandsGrid');
+      if (!brands.length) {
+        grid.innerHTML = `
+          <div class="empty-state" style="grid-column:1/-1">
+            <div class="empty-icon">🏪</div>
+            <p>No brands found for this filter.</p>
+          </div>`;
+        return;
+      }
+
+      grid.innerHTML = brands.map(b => `
+        <div class="brand-card">
+          <div class="brand-header">
+            <div>
+              <div class="brand-name">${b.name}</div>
+              <div class="brand-meta">
+                <span class="badge badge-purple">${b.niche}</span>
+                ${b.country ? `<span class="badge badge-gray">${b.country}</span>` : ''}
+              </div>
+            </div>
+          </div>
+
+          <div class="brand-detail">
+            Min. followers: <span>${fmtFollowers(b.min_followers)}</span>
+            ${b.max_followers ? ` — <span>${fmtFollowers(b.max_followers)}</span>` : ''}
+          </div>
+
+          ${b.website ? `<a class="brand-website" href="${b.website}" target="_blank" rel="noopener">🔗 ${b.website.replace(/https?:\/\/(www\.)?/, '')}</a>` : ''}
+
+          <button
+            class="btn btn-gold btn-sm"
+            onclick="openPitchModal('${b.id}', '${b.name.replace(/'/g, "\\'")}', '${(b.niche||'').replace(/'/g, "\\'")}', '${(b.contact_email||'').replace(/'/g, "\\'")}')"
+          >
+            ✨ Generate AI Pitch
+          </button>
+        </div>
+      `).join('');
+    }
+
+    // ── Load brands ───────────────────────────────────────────────────
+    async function loadBrands(niche = '') {
+      const grid = document.getElementById('brandsGrid');
+      grid.innerHTML = Array(6).fill(`
+        <div class="brand-card">
+          <div class="skeleton" style="height:20px;width:60%;margin-bottom:12px"></div>
+          <div class="skeleton" style="height:14px;width:40%;margin-bottom:8px"></div>
+          <div class="skeleton" style="height:36px;margin-top:auto"></div>
+        </div>`).join('');
+
+      try {
+        // GET /api/brands/?niche=...
+        const brands = await API.getBrands(niche ? { niche } : {});
+        renderBrands(brands);
+      } catch (err) {
+        grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1"><div class="empty-icon">⚠️</div><p>${err.message}</p></div>`;
+      }
+    }
+
+    // ── Niche filter clicks ───────────────────────────────────────────
+    document.getElementById('nichePills').addEventListener('click', (e) => {
+      const pill = e.target.closest('.niche-pill');
+      if (!pill) return;
+      document.querySelectorAll('.niche-pill').forEach(p => p.classList.remove('active'));
+      pill.classList.add('active');
+      currentNiche = pill.dataset.niche;
+      loadBrands(currentNiche);
+    });
+
+    // ── Pitch Modal ───────────────────────────────────────────────────
+    window.openPitchModal = async function(brandId, brandName, brandNiche, contactEmail) {
+      // Show modal
+      document.getElementById('pitchModal').classList.add('open');
+      document.getElementById('modalBrandName').textContent = brandName;
+      document.getElementById('modalBrandSub').textContent = brandNiche;
+      document.getElementById('pitchLoading').style.display = 'block';
+      document.getElementById('pitchContent').style.display = 'none';
+      document.getElementById('pitchError').style.display = 'none';
+      currentPitchId = null;
+
+      try {
+        // POST /api/pitches/generate  { brand_id }
+        const pitch = await API.generatePitch(brandId);
+
+        currentPitchId = pitch.id;
+
+        document.getElementById('pitchSubject').textContent = pitch.subject;
+        document.getElementById('pitchBody').textContent    = pitch.body;
+
+        // Build a mailto link for "Open in Gmail"
+        const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(contactEmail)}&su=${encodeURIComponent(pitch.subject)}&body=${encodeURIComponent(pitch.body)}`;
+        document.getElementById('emailDirectBtn').href = gmailUrl;
+        if (!contactEmail) document.getElementById('emailDirectBtn').style.display = 'none';
+
+        document.getElementById('pitchLoading').style.display = 'none';
+        document.getElementById('pitchContent').style.display = 'block';
+
+      } catch (err) {
+        document.getElementById('pitchLoading').style.display = 'none';
+        document.getElementById('pitchError').style.display = 'block';
+        document.getElementById('pitchError').textContent = err.message.includes('profile')
+          ? '⚠️ Please complete your profile before generating a pitch.'
+          : `⚠️ ${err.message}`;
+      }
+    };
+
+    // Close modal
+    document.getElementById('modalClose').addEventListener('click', () => {
+      document.getElementById('pitchModal').classList.remove('open');
+    });
+    document.getElementById('pitchModal').addEventListener('click', (e) => {
+      if (e.target === document.getElementById('pitchModal')) {
+        document.getElementById('pitchModal').classList.remove('open');
+      }
+    });
+
+    // Copy pitch to clipboard
+    document.getElementById('copyPitchBtn').addEventListener('click', async () => {
+      const subject = document.getElementById('pitchSubject').textContent;
+      const body    = document.getElementById('pitchBody').textContent;
+      const full    = `Subject: ${subject}\n\n${body}`;
+
+      try {
+        await navigator.clipboard.writeText(full);
+        const btn = document.getElementById('copyPitchBtn');
+        btn.textContent = '✅ Copied!';
+        setTimeout(() => btn.textContent = '📋 Copy Email', 2000);
+
+        // Mark pitch as "sent" in the background
+        if (currentPitchId) {
+          await API.updatePitchStatus(currentPitchId, 'sent').catch(() => {});
+        }
+      } catch (_) {
+        alert('Could not copy. Please select and copy the text manually.');
+      }
+    });
+
+    // ── Init ──────────────────────────────────────────────────────────
+    loadBrands();
+  </script>
+</body>
+</html>
