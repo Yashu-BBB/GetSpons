@@ -9,7 +9,7 @@
  * When you deploy, change it to your live URL (Render / Railway).
  */
 
-export const BASE_URL = "http://localhost:8000"; // ← change this when deploying
+export const BASE_URL = "http://127.0.0.1:8000"; // ← change this when deploying
 
 // ─── Token helpers ───────────────────────────────────────────────────────────
 // We store the JWT in localStorage so the user stays logged in across pages.
