@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Pitches — getSpons</title>
+  <link rel="stylesheet" href="css/shared.css" />
+  <style>
+    body { background: var(--gray-50); }
+
+    /* ── Summary bar ── */
+    .summary-bar {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    .sum-card {
+      background: var(--white);
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius);
+      padding: 16px;
+      text-align: center;
+    }
+    .sum-num   { font-family: 'Syne', sans-serif; font-size: 1.4rem; font-weight: 800; }
+    .sum-label { font-size: 0.72rem; color: var(--gray-500); font-weight: 600; text-transform: uppercase; margin-top: 2px; }
+
+    /* ── Pitch rows ── */
+    .pitch-row {
+      background: var(--white);
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius);
+      padding: 18px 20px;
+      margin-bottom: 12px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 12px;
+      align-items: start;
+      transition: box-shadow 0.2s;
+    }
+    .pitch-row:hover { box-shadow: var(--shadow-sm); }
+
+    .pitch-row-brand   { font-weight: 700; font-size: 0.95rem; margin-bottom: 4px; }
+    .pitch-row-subject { font-size: 0.82rem; color: var(--gray-500); margin-bottom: 8px; }
+    .pitch-row-date    { font-size: 0.72rem; color: var(--gray-300); }
+
+    .pitch-row-right { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
+
+    .status-select {
+      font-size: 0.75rem;
+      font-weight: 600;
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius-sm);
+      padding: 5px 10px;
+      color: var(--gray-700);
+      background: var(--white);
+      cursor: pointer;
+      transition: border-color 0.2s;
+    }
+    .status-select:focus { outline: none; border-color: var(--purple); }
+
+    .expand-btn {
+      background: none;
+      border: none;
+      font-size: 0.78rem;
+      color: var(--purple);
+      font-weight: 600;
+      cursor: pointer;
+      padding: 0;
+    }
+    .expand-btn:hover { text-decoration: underline; }
+
+    .pitch-body-preview {
+      display: none;
+      margin-top: 12px;
+      background: var(--gray-50);
+      border-radius: var(--radius-sm);
+      padding: 14px;
+      font-size: 0.82rem;
+      color: var(--gray-700);
+      line-height: 1.7;
+      white-space: pre-wrap;
+      border-top: 1px solid var(--gray-100);
+    }
+    .pitch-body-preview.open { display: block; }
+
+    @media (max-width: 540px) {
+      .summary-bar { grid-template-columns: 1fr 1fr; }
+      .pitch-row   { grid-template-columns: 1fr; }
+      .pitch-row-right { flex-direction: row; align-items: center; }
+    }
+  </style>
+</head>
+<body class="has-mobile-nav">
+
+  <div class="page-wrapper">
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-logo">get<span>Spons</span></div>
+      <nav class="sidebar-nav">
+        <a href="dashboard.html" class="sidebar-link"><span class="icon">🏠</span> Dashboard</a>
+        <a href="brands.html"    class="sidebar-link"><span class="icon">🏪</span> Find Brands</a>
+        <a href="pitches.html"   class="sidebar-link active"><span class="icon">✉️</span> My Pitches</a>
+        <a href="profile.html"   class="sidebar-link"><span class="icon">👤</span> Edit Profile</a>
+      </nav>
+      <div class="sidebar-bottom">
+        <button class="btn btn-ghost btn-full btn-sm" id="logoutBtn">Log out</button>
+      </div>
+    </aside>
+
+    <!-- Main -->
+    <main class="main-content">
+      <h1 class="page-title">My Pitches</h1>
+      <p class="page-subtitle">Track every brand outreach. Update statuses as you hear back.</p>
+
+      <!-- Summary bar -->
+      <div class="summary-bar" id="summaryBar">
+        <div class="sum-card"><div class="sum-num" id="cntTotal">—</div><div class="sum-label">Total</div></div>
+        <div class="sum-card"><div class="sum-num" id="cntSent" style="color:var(--purple)">—</div><div class="sum-label">Sent</div></div>
+        <div class="sum-card"><div class="sum-num" id="cntReplied" style="color:var(--gold)">—</div><div class="sum-label">Replied</div></div>
+        <div class="sum-card"><div class="sum-num" id="cntDeal" style="color:var(--green)">—</div><div class="sum-label">Deals 🎉</div></div>
+      </div>
+
+      <!-- Pitch list -->
+      <div id="pitchList">
+        <!-- Skeleton -->
+        <div class="pitch-row"><div class="skeleton" style="height:60px"></div></div>
+        <div class="pitch-row"><div class="skeleton" style="height:60px"></div></div>
+        <div class="pitch-row"><div class="skeleton" style="height:60px"></div></div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Mobile nav -->
+  <nav class="mobile-nav">
+    <a href="dashboard.html"><span class="icon">🏠</span>Home</a>
+    <a href="brands.html"><span class="icon">🏪</span>Brands</a>
+    <a href="pitches.html" class="active"><span class="icon">✉️</span>Pitches</a>
+    <a href="profile.html"><span class="icon">👤</span>Profile</a>
+  </nav>
+
+  <script type="module">
+    import { API, getToken } from './js/api.js';
+
+    if (!getToken()) window.location.href = 'login.html';
+    document.getElementById('logoutBtn')?.addEventListener('click', () => API.logout());
+
+    function fmtDate(iso) {
+      if (!iso) return '';
+      return new Date(iso).toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' });
+    }
+
+    // Map status → CSS class suffix
+    const statusColors = { draft:'gray', sent:'purple', replied:'gold', deal:'green' };
+
+    function renderSummary(pitches) {
+      document.getElementById('cntTotal').textContent   = pitches.length;
+      document.getElementById('cntSent').textContent    = pitches.filter(p => p.status === 'sent').length;
+      document.getElementById('cntReplied').textContent = pitches.filter(p => p.status === 'replied').length;
+      document.getElementById('cntDeal').textContent    = pitches.filter(p => p.status === 'deal').length;
+    }
+
+    function renderPitches(pitches) {
+      const el = document.getElementById('pitchList');
+
+      if (!pitches.length) {
+        el.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-icon">✉️</div>
+            <p>No pitches yet. Go find a brand and generate your first AI pitch!</p>
+            <a href="brands.html" class="btn btn-primary btn-sm">Browse Brands →</a>
+          </div>`;
+        return;
+      }
+
+      el.innerHTML = pitches.map((p, i) => `
+        <div class="pitch-row" id="row-${p.id}">
+          <div>
+            <div class="pitch-row-brand">
+              ${p.brands?.name || 'Unknown Brand'}
+            </div>
+            <div class="pitch-row-subject">${p.subject}</div>
+            <div class="pitch-row-date">${fmtDate(p.created_at)}</div>
+
+            <!-- Expandable body -->
+            <button class="expand-btn" onclick="toggleBody('${p.id}')">Show email ▾</button>
+            <div class="pitch-body-preview" id="body-${p.id}">${p.body}</div>
+          </div>
+
+          <div class="pitch-row-right">
+            <!-- Status dropdown — calls PATCH /api/pitches/{id} on change -->
+            <select
+              class="status-select"
+              id="status-${p.id}"
+              onchange="updateStatus('${p.id}', this.value)"
+              title="Update pitch status"
+            >
+              <option value="draft"   ${p.status==='draft'   ? 'selected':''}>📝 Draft</option>
+              <option value="sent"    ${p.status==='sent'    ? 'selected':''}>📤 Sent</option>
+              <option value="replied" ${p.status==='replied' ? 'selected':''}>💬 Replied</option>
+              <option value="deal"    ${p.status==='deal'    ? 'selected':''}>🎉 Deal!</option>
+            </select>
+
+            <button
+              class="btn btn-ghost btn-sm"
+              onclick="copyPitch('${p.id}')"
+              title="Copy full email to clipboard"
+            >📋 Copy</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // ── Toggle email body ─────────────────────────────────────────────
+    window.toggleBody = function(id) {
+      const el = document.getElementById(`body-${id}`);
+      const btn = el.previousElementSibling;
+      el.classList.toggle('open');
+      btn.textContent = el.classList.contains('open') ? 'Hide email ▴' : 'Show email ▾';
+    };
+
+    // ── Copy pitch email to clipboard ─────────────────────────────────
+    window.copyPitch = async function(id) {
+      const subject = document.getElementById(`status-${id}`)?.closest('.pitch-row').querySelector('.pitch-row-subject')?.textContent || '';
+      const body    = document.getElementById(`body-${id}`)?.textContent || '';
+      try {
+        await navigator.clipboard.writeText(`Subject: ${subject}\n\n${body}`);
+        const btn = document.getElementById(`status-${id}`)?.closest('.pitch-row').querySelector('[onclick*="copyPitch"]');
+        if (btn) { btn.textContent = '✅ Copied!'; setTimeout(() => btn.textContent = '📋 Copy', 2000); }
+      } catch (_) {
+        alert('Copy failed. Open the email body and copy manually.');
+      }
+    };
+
+    // ── Update status ─────────────────────────────────────────────────
+    window.updateStatus = async function(pitchId, newStatus) {
+      try {
+        // PATCH /api/pitches/{pitch_id}  { status }
+        await API.updatePitchStatus(pitchId, newStatus);
+        // Re-render the summary numbers
+        // (instead of full reload, just tweak counts in place)
+        loadPitches();
+      } catch (err) {
+        alert(`Could not update status: ${err.message}`);
+        loadPitches(); // reset to saved state
+      }
+    };
+
+    // ── Load pitches ──────────────────────────────────────────────────
+    async function loadPitches() {
+      try {
+        // GET /api/pitches/mine
+        const pitches = await API.getMyPitches();
+        renderSummary(pitches);
+        renderPitches(pitches);
+      } catch (err) {
+        document.getElementById('pitchList').innerHTML = `
+          <div class="empty-state">
+            <div class="empty-icon">⚠️</div>
+            <p>${err.message || 'Could not load pitches.'}</p>
+          </div>`;
+      }
+    }
+
+    loadPitches();
+  </script>
+</body>
+</html>

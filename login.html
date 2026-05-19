@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Log In — getSpons</title>
+  <link rel="stylesheet" href="css/shared.css" />
+  <style>
+    body { background: var(--gray-50); display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+
+    .auth-card {
+      background: var(--white);
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius);
+      padding: 40px 36px;
+      width: 100%;
+      max-width: 420px;
+      box-shadow: var(--shadow-md);
+    }
+
+    .auth-logo {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--purple);
+      text-align: center;
+      margin-bottom: 6px;
+    }
+    .auth-logo span { color: var(--gold); }
+
+    .auth-tagline {
+      text-align: center;
+      font-size: 0.88rem;
+      color: var(--gray-500);
+      margin-bottom: 28px;
+    }
+
+    .auth-form { display: flex; flex-direction: column; gap: 16px; }
+
+    .auth-footer {
+      margin-top: 20px;
+      text-align: center;
+      font-size: 0.82rem;
+      color: var(--gray-500);
+    }
+    .auth-footer a { color: var(--purple); font-weight: 600; }
+  </style>
+</head>
+<body>
+  <div class="auth-card">
+    <div class="auth-logo">get<span>Spons</span></div>
+    <p class="auth-tagline">Welcome back 👋</p>
+
+    <div class="alert" id="alertBox"></div>
+
+    <form class="auth-form" id="loginForm">
+
+      <div class="form-group">
+        <label class="form-label" for="email">Email address</label>
+        <input
+          class="form-input"
+          type="email"
+          id="email"
+          placeholder="you@example.com"
+          required
+          autocomplete="email"
+        />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="password">Password</label>
+        <input
+          class="form-input"
+          type="password"
+          id="password"
+          placeholder="Your password"
+          required
+          autocomplete="current-password"
+        />
+      </div>
+
+      <button type="submit" class="btn btn-primary btn-full btn-lg" id="submitBtn">
+        Log in
+      </button>
+    </form>
+
+    <p class="auth-footer">
+      Don't have an account? <a href="signup.html">Sign up free</a>
+    </p>
+  </div>
+
+  <script type="module">
+    import { API, getToken } from './js/api.js';
+
+    // Already logged in → skip to dashboard
+    if (getToken()) window.location.href = 'dashboard.html';
+
+    const form      = document.getElementById('loginForm');
+    const alertBox  = document.getElementById('alertBox');
+    const submitBtn = document.getElementById('submitBtn');
+
+    function showError(msg) {
+      alertBox.textContent = msg;
+      alertBox.className = 'alert alert-error show';
+    }
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const email    = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<span class="spinner"></span> Logging in…';
+
+      try {
+        // API.login() calls POST /api/auth/login
+        // AND automatically saves the token + user_id to localStorage
+        const result = await API.login(email, password);
+
+        if (result.access_token) {
+          // ✅ Success — go to dashboard
+          window.location.href = 'dashboard.html';
+        } else {
+          // Backend returned { error: "..." }
+          showError(result.error || 'Login failed. Check your credentials.');
+        }
+
+      } catch (err) {
+        showError(err.message || 'Invalid email or password.');
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Log in';
+      }
+    });
+  </script>
+</body>
+</html>

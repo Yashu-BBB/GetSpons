@@ -1,0 +1,884 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>getSpons — Sponsorships for Indian Creators</title>
+
+  <!-- Google Fonts: Syne (headings) + DM Sans (body) -->
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ─── CSS Variables ─── */
+    :root {
+      --purple: #6366F1;
+      --purple-dark: #4F46E5;
+      --purple-light: #EEF2FF;
+      --gold: #F59E0B;
+      --gold-light: #FEF3C7;
+      --white: #FFFFFF;
+      --gray-50: #F9FAFB;
+      --gray-100: #F3F4F6;
+      --gray-300: #D1D5DB;
+      --gray-500: #6B7280;
+      --gray-700: #374151;
+      --gray-900: #111827;
+      --radius: 12px;
+      --radius-sm: 8px;
+    }
+
+    /* ─── Reset & Base ─── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--white);
+      color: var(--gray-900);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    h1, h2, h3 { font-family: 'Syne', sans-serif; line-height: 1.2; }
+
+    a { text-decoration: none; color: inherit; }
+
+    img { max-width: 100%; }
+
+    /* ─── Utility ─── */
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    .btn-primary {
+      display: inline-block;
+      background: var(--gold);
+      color: #78350F;
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 600;
+      font-size: 1rem;
+      padding: 14px 28px;
+      border-radius: var(--radius-sm);
+      border: none;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+    }
+    .btn-primary:hover { background: #FBBF24; }
+    .btn-primary:active { transform: scale(0.98); }
+
+    .btn-outline {
+      display: inline-block;
+      background: transparent;
+      color: var(--purple);
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 600;
+      font-size: 1rem;
+      padding: 13px 28px;
+      border-radius: var(--radius-sm);
+      border: 2px solid var(--purple);
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .btn-outline:hover { background: var(--purple-light); }
+
+    /* ─── NAV ─── */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(255,255,255,0.95);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--gray-100);
+      padding: 16px 0;
+    }
+
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .nav-logo {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: var(--purple);
+    }
+
+    .nav-logo span { color: var(--gold); }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 32px;
+      list-style: none;
+    }
+
+    .nav-links li a {
+      font-size: 0.95rem;
+      color: var(--gray-700);
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+    .nav-links li a:hover { color: var(--purple); }
+
+    .nav-cta { display: flex; gap: 12px; align-items: center; }
+
+    /* ─── HERO ─── */
+    .hero {
+      padding: 80px 0 64px;
+      background: linear-gradient(160deg, var(--purple-light) 0%, var(--white) 60%);
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* decorative blob */
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -120px; right: -120px;
+      width: 480px; height: 480px;
+      background: radial-gradient(circle, #C7D2FE 0%, transparent 70%);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+
+    .hero-inner {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 48px;
+      align-items: center;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--gold-light);
+      color: #92400E;
+      font-size: 0.8rem;
+      font-weight: 600;
+      padding: 6px 14px;
+      border-radius: 999px;
+      margin-bottom: 20px;
+      border: 1px solid #FDE68A;
+    }
+
+    .hero h1 {
+      font-size: clamp(2rem, 5vw, 3rem);
+      font-weight: 800;
+      color: var(--gray-900);
+      margin-bottom: 20px;
+    }
+
+    .hero h1 .highlight {
+      color: var(--purple);
+      position: relative;
+    }
+
+    .hero p {
+      font-size: 1.05rem;
+      color: var(--gray-500);
+      margin-bottom: 32px;
+      max-width: 480px;
+    }
+
+    .hero-actions { display: flex; gap: 14px; flex-wrap: wrap; }
+
+    /* Media Kit Preview Card */
+    .hero-card {
+      background: var(--white);
+      border: 1px solid var(--gray-300);
+      border-radius: 16px;
+      padding: 28px;
+      box-shadow: 0 20px 60px rgba(99,102,241,0.12);
+      position: relative;
+    }
+
+    .hero-card-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .avatar {
+      width: 48px; height: 48px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--purple), #A78BFA);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      color: white;
+      font-size: 1rem;
+    }
+
+    .hero-card-title { font-size: 1rem; font-weight: 700; }
+    .hero-card-sub { font-size: 0.8rem; color: var(--gray-500); }
+
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .stat-box {
+      background: var(--gray-50);
+      border: 1px solid var(--gray-100);
+      border-radius: var(--radius-sm);
+      padding: 12px;
+      text-align: center;
+    }
+
+    .stat-num {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: var(--purple);
+    }
+
+    .stat-label { font-size: 0.7rem; color: var(--gray-500); margin-top: 2px; }
+
+    .kit-btn {
+      width: 100%;
+      text-align: center;
+      background: var(--purple);
+      color: white;
+      border: none;
+      padding: 12px;
+      border-radius: var(--radius-sm);
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .kit-btn:hover { background: var(--purple-dark); }
+
+    .card-badge {
+      position: absolute;
+      top: -12px; right: 20px;
+      background: var(--gold);
+      color: #78350F;
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 999px;
+    }
+
+    /* ─── SOCIAL PROOF ─── */
+    .social-proof {
+      padding: 20px 0 48px;
+      text-align: center;
+    }
+
+    .social-proof p {
+      font-size: 0.85rem;
+      color: var(--gray-500);
+      margin-bottom: 16px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .brand-logos {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 32px;
+      flex-wrap: wrap;
+    }
+
+    .brand-pill {
+      background: var(--gray-100);
+      color: var(--gray-700);
+      font-size: 0.82rem;
+      font-weight: 600;
+      padding: 7px 16px;
+      border-radius: 999px;
+    }
+
+    /* ─── HOW IT WORKS ─── */
+    .how {
+      padding: 80px 0;
+      background: var(--gray-50);
+    }
+
+    .section-tag {
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--purple);
+      margin-bottom: 12px;
+    }
+
+    .section-title {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(1.6rem, 4vw, 2.4rem);
+      font-weight: 800;
+      color: var(--gray-900);
+      margin-bottom: 12px;
+    }
+
+    .section-sub {
+      font-size: 1rem;
+      color: var(--gray-500);
+      max-width: 520px;
+    }
+
+    .section-head { margin-bottom: 48px; }
+
+    .steps-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 24px;
+    }
+
+    .step-card {
+      background: var(--white);
+      border: 1px solid var(--gray-300);
+      border-radius: var(--radius);
+      padding: 28px 24px;
+      position: relative;
+      transition: box-shadow 0.2s, transform 0.2s;
+    }
+    .step-card:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(99,102,241,0.1); }
+
+    .step-num {
+      width: 36px; height: 36px;
+      background: var(--purple-light);
+      color: var(--purple);
+      border-radius: 50%;
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 0.9rem;
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 16px;
+    }
+
+    .step-icon {
+      font-size: 1.8rem;
+      margin-bottom: 12px;
+    }
+
+    .step-card h3 {
+      font-size: 1.05rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .step-card p {
+      font-size: 0.88rem;
+      color: var(--gray-500);
+      line-height: 1.6;
+    }
+
+    /* ─── FEATURES ─── */
+    .features { padding: 80px 0; }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 28px;
+    }
+
+    .feature-card {
+      border: 1px solid var(--gray-100);
+      border-radius: var(--radius);
+      padding: 28px;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .feature-card:hover { border-color: var(--purple); box-shadow: 0 0 0 3px var(--purple-light); }
+
+    .feature-icon {
+      width: 48px; height: 48px;
+      background: var(--purple-light);
+      border-radius: var(--radius-sm);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.4rem;
+      margin-bottom: 16px;
+    }
+
+    .feature-card h3 { font-size: 1.05rem; font-weight: 700; margin-bottom: 8px; }
+    .feature-card p { font-size: 0.88rem; color: var(--gray-500); }
+
+    .feature-tag {
+      display: inline-block;
+      margin-top: 12px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 999px;
+      background: var(--gold-light);
+      color: #92400E;
+    }
+    .feature-tag.pro { background: var(--purple-light); color: var(--purple-dark); }
+
+    /* ─── PRICING ─── */
+    .pricing {
+      padding: 80px 0;
+      background: var(--gray-50);
+    }
+
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .plan-card {
+      background: var(--white);
+      border: 1.5px solid var(--gray-300);
+      border-radius: 16px;
+      padding: 32px 28px;
+      position: relative;
+    }
+
+    .plan-card.featured {
+      border-color: var(--purple);
+      box-shadow: 0 0 0 4px var(--purple-light);
+    }
+
+    .plan-badge {
+      position: absolute;
+      top: -14px; left: 50%;
+      transform: translateX(-50%);
+      background: var(--purple);
+      color: white;
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 4px 14px;
+      border-radius: 999px;
+      white-space: nowrap;
+    }
+
+    .plan-name {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .plan-price {
+      font-family: 'Syne', sans-serif;
+      font-size: 2.4rem;
+      font-weight: 800;
+      color: var(--gray-900);
+    }
+    .plan-price sup { font-size: 1rem; vertical-align: super; }
+    .plan-price span { font-size: 0.9rem; color: var(--gray-500); font-weight: 400; }
+
+    .plan-features {
+      list-style: none;
+      margin: 20px 0 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .plan-features li {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.88rem;
+      color: var(--gray-700);
+    }
+
+    .plan-features li::before {
+      content: '✓';
+      width: 18px; height: 18px;
+      background: #DCFCE7;
+      color: #166534;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.65rem;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .plan-features li.muted { color: var(--gray-300); }
+    .plan-features li.muted::before { background: var(--gray-100); color: var(--gray-300); }
+
+    .plan-btn {
+      width: 100%;
+      padding: 13px;
+      border-radius: var(--radius-sm);
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 600;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .plan-btn-free {
+      background: transparent;
+      color: var(--gray-700);
+      border: 1.5px solid var(--gray-300);
+    }
+    .plan-btn-free:hover { border-color: var(--purple); color: var(--purple); }
+
+    .plan-btn-pro {
+      background: var(--purple);
+      color: white;
+      border: none;
+    }
+    .plan-btn-pro:hover { background: var(--purple-dark); }
+
+    /* ─── CTA SECTION ─── */
+    .cta-section {
+      padding: 80px 0;
+      background: var(--purple);
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cta-section::before {
+      content: '';
+      position: absolute;
+      top: -80px; right: -80px;
+      width: 300px; height: 300px;
+      background: rgba(255,255,255,0.05);
+      border-radius: 50%;
+    }
+
+    .cta-section h2 {
+      font-size: clamp(1.6rem, 4vw, 2.4rem);
+      color: white;
+      margin-bottom: 12px;
+    }
+
+    .cta-section p {
+      color: rgba(255,255,255,0.75);
+      font-size: 1rem;
+      margin-bottom: 32px;
+    }
+
+    .cta-section .btn-primary { font-size: 1.05rem; padding: 16px 36px; }
+
+    /* ─── FOOTER ─── */
+    footer {
+      background: var(--gray-900);
+      color: var(--gray-500);
+      padding: 40px 0;
+      text-align: center;
+      font-size: 0.85rem;
+    }
+
+    footer .footer-logo {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.2rem;
+      font-weight: 800;
+      color: white;
+      margin-bottom: 12px;
+    }
+
+    footer .footer-logo span { color: var(--gold); }
+
+    /* ─── HAMBURGER (mobile nav) ─── */
+    .hamburger {
+      display: none;
+      background: none;
+      border: none;
+      cursor: pointer;
+      flex-direction: column;
+      gap: 5px;
+      padding: 4px;
+    }
+    .hamburger span {
+      display: block;
+      width: 22px; height: 2px;
+      background: var(--gray-700);
+      border-radius: 2px;
+      transition: all 0.3s;
+    }
+
+    /* ─── MOBILE ─── */
+    @media (max-width: 768px) {
+      .nav-links, .nav-cta { display: none; }
+      .hamburger { display: flex; }
+
+      .nav-links.open {
+        display: flex;
+        flex-direction: column;
+        position: absolute;
+        top: 65px; left: 0; right: 0;
+        background: white;
+        padding: 20px 24px;
+        border-bottom: 1px solid var(--gray-100);
+        gap: 16px;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+      }
+
+      .nav-cta.open {
+        display: flex;
+        flex-direction: column;
+        position: absolute;
+        top: 220px; left: 0; right: 0;
+        background: white;
+        padding: 0 24px 20px;
+        gap: 10px;
+      }
+
+      .hero-inner { grid-template-columns: 1fr; }
+      .hero-card { display: none; } /* hide card on mobile hero */
+      .hero { padding: 48px 0 40px; }
+
+      .features-grid { grid-template-columns: 1fr; }
+      .pricing-grid { grid-template-columns: 1fr; }
+
+      .steps-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ===== NAV ===== -->
+  <nav>
+    <div class="container nav-inner">
+      <a href="index.html" class="nav-logo">get<span>Spons</span></a>
+
+      <ul class="nav-links" id="navLinks">
+        <li><a href="#how-it-works">How it works</a></li>
+        <li><a href="#features">Features</a></li>
+        <li><a href="#pricing">Pricing</a></li>
+      </ul>
+
+      <div class="nav-cta" id="navCta">
+        <a href="login.html" class="btn-outline" style="padding: 9px 20px; font-size:0.9rem;">Log in</a>
+        <a href="signup.html" class="btn-primary" style="padding: 9px 20px; font-size:0.9rem;">Sign up free</a>
+      </div>
+
+      <button class="hamburger" id="hamburger" aria-label="Toggle menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ===== HERO ===== -->
+  <section class="hero">
+    <div class="container hero-inner">
+
+      <div class="hero-text">
+        <div class="hero-badge">🇮🇳 Made for Indian Creators</div>
+        <h1>Land Brand Deals.<br><span class="highlight">Without the Hustle.</span></h1>
+        <p>
+          AI-powered Media Kits, 30+ Indian D2C brand contacts, and
+          personalized pitch emails — all in one tool built for micro-creators.
+        </p>
+        <div class="hero-actions">
+          <a href="signup.html" class="btn-primary">✨ Generate Free Media Kit</a>
+          <a href="#how-it-works" class="btn-outline">See how it works</a>
+        </div>
+      </div>
+
+      <!-- Preview Card (desktop only) -->
+      <div class="hero-card">
+        <div class="card-badge">FREE Preview</div>
+        <div class="hero-card-header">
+          <div class="avatar">AK</div>
+          <div>
+            <div class="hero-card-title">Ananya Kulkarni</div>
+            <div class="hero-card-sub">@ananya.creates · Beauty & Lifestyle</div>
+          </div>
+        </div>
+        <div class="stats-row">
+          <div class="stat-box">
+            <div class="stat-num">42K</div>
+            <div class="stat-label">Followers</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-num">6.8%</div>
+            <div class="stat-label">Engagement</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-num">₹8K</div>
+            <div class="stat-label">Avg. Rate</div>
+          </div>
+        </div>
+        <button class="kit-btn" onclick="window.location.href='signup.html'">
+          📄 Download My Media Kit (PDF)
+        </button>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ===== SOCIAL PROOF ===== -->
+  <section class="social-proof">
+    <div class="container">
+      <p>Trusted by creators pitching to brands like</p>
+      <div class="brand-logos">
+        <span class="brand-pill">Mamaearth</span>
+        <span class="brand-pill">boAt</span>
+        <span class="brand-pill">Nykaa</span>
+        <span class="brand-pill">WOW Skin</span>
+        <span class="brand-pill">Noise</span>
+        <span class="brand-pill">mCaffeine</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== HOW IT WORKS ===== -->
+  <section class="how" id="how-it-works">
+    <div class="container">
+      <div class="section-head">
+        <div class="section-tag">How it works</div>
+        <h2 class="section-title">From Zero to First Brand Deal in 4 Steps</h2>
+        <p class="section-sub">No agencies. No cold calling strangers. Just your stats, our AI, and a polished pitch.</p>
+      </div>
+
+      <div class="steps-grid">
+        <div class="step-card">
+          <div class="step-num">1</div>
+          <div class="step-icon">📊</div>
+          <h3>Enter Your Stats</h3>
+          <p>Paste your Instagram or YouTube handle, followers, and niche. Takes 60 seconds.</p>
+        </div>
+        <div class="step-card">
+          <div class="step-num">2</div>
+          <div class="step-icon">📄</div>
+          <h3>Download Media Kit</h3>
+          <p>AI generates a professional PDF with your stats, niche, and rate card — instantly.</p>
+        </div>
+        <div class="step-card">
+          <div class="step-num">3</div>
+          <div class="step-icon">🔍</div>
+          <h3>Find D2C Brands</h3>
+          <p>Browse 30+ Indian brands sorted by niche. See contact emails and fit scores.</p>
+        </div>
+        <div class="step-card">
+          <div class="step-num">4</div>
+          <div class="step-icon">✉️</div>
+          <h3>Send AI Pitch</h3>
+          <p>One click to generate a personalized email. Copy it and hit send. Done.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== FEATURES ===== -->
+  <section class="features" id="features">
+    <div class="container">
+      <div class="section-head">
+        <div class="section-tag">Features</div>
+        <h2 class="section-title">Everything You Need to Get Sponsored</h2>
+        <p class="section-sub">Built specifically for Indian micro-creators. No USD pricing. No enterprise bloat.</p>
+      </div>
+
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon">📄</div>
+          <h3>AI Media Kit Generator</h3>
+          <p>Your social stats turned into a beautiful, downloadable PDF that brands actually read. No Canva required.</p>
+          <span class="feature-tag">Free</span>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🏪</div>
+          <h3>Indian D2C Brand Database</h3>
+          <p>30+ curated Indian brands across Beauty, Tech, Food, and more — with verified contact info.</p>
+          <span class="feature-tag pro">Pro</span>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🤖</div>
+          <h3>AI Pitch Writer</h3>
+          <p>Claude AI writes a personalized outreach email for each brand based on your niche and their product.</p>
+          <span class="feature-tag pro">Pro</span>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">📋</div>
+          <h3>Creator Dashboard</h3>
+          <p>Track which brands you've pitched, save drafts, and manage your media kit — all in one place.</p>
+          <span class="feature-tag">Free</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== PRICING ===== -->
+  <section class="pricing" id="pricing">
+    <div class="container">
+      <div class="section-head" style="text-align:center;">
+        <div class="section-tag">Pricing</div>
+        <h2 class="section-title">Simple INR Pricing. No Surprises.</h2>
+        <p class="section-sub" style="margin: 0 auto;">Cancel anytime. Pay in ₹ via UPI, cards, or net banking.</p>
+      </div>
+
+      <div class="pricing-grid">
+
+        <!-- Free Plan -->
+        <div class="plan-card">
+          <div class="plan-name">Starter</div>
+          <div class="plan-price"><sup>₹</sup>0<span>/month</span></div>
+          <ul class="plan-features">
+            <li>1 AI Media Kit (PDF)</li>
+            <li>Creator Dashboard</li>
+            <li>3 brand leads (preview)</li>
+            <li class="muted">Full brand database (30+)</li>
+            <li class="muted">AI Pitch Writer</li>
+            <li class="muted">Priority support</li>
+          </ul>
+          <button class="plan-btn plan-btn-free" onclick="window.location.href='signup.html'">
+            Get started free
+          </button>
+        </div>
+
+        <!-- Pro Plan -->
+        <div class="plan-card featured">
+          <div class="plan-badge">Most Popular</div>
+          <div class="plan-name">Creator Pro</div>
+          <div class="plan-price"><sup>₹</sup>999<span>/month</span></div>
+          <ul class="plan-features">
+            <li>Unlimited Media Kits</li>
+            <li>Creator Dashboard</li>
+            <li>Full brand database (30+)</li>
+            <li>AI Pitch Writer (unlimited)</li>
+            <li>Verified contact emails</li>
+            <li>Priority support</li>
+          </ul>
+          <button class="plan-btn plan-btn-pro" onclick="window.location.href='signup.html'">
+            Start 7-day free trial
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== CTA ===== -->
+  <section class="cta-section">
+    <div class="container">
+      <h2>Your first brand deal is one pitch away.</h2>
+      <p>Join hundreds of Indian creators already using getSpons.</p>
+      <a href="signup.html" class="btn-primary">Generate My Free Media Kit →</a>
+    </div>
+  </section>
+
+  <!-- ===== FOOTER ===== -->
+  <footer>
+    <div class="container">
+      <div class="footer-logo">get<span>Spons</span></div>
+      <p>Built in India 🇮🇳 for Indian Creators · © 2025 getSpons</p>
+    </div>
+  </footer>
+
+  <!-- ===== JS: Mobile Nav Toggle ===== -->
+  <script>
+    const hamburger = document.getElementById('hamburger');
+    const navLinks  = document.getElementById('navLinks');
+    const navCta    = document.getElementById('navCta');
+
+    hamburger.addEventListener('click', () => {
+      navLinks.classList.toggle('open');
+      navCta.classList.toggle('open');
+    });
+  </script>
+
+</body>
+</html>
