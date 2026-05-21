@@ -9,9 +9,12 @@ Exposes:
 from fastapi import APIRouter, Header, HTTPException
 from pydantic import BaseModel, field_validator, model_validator
 from typing import Optional, List
+
 from database import supabase, supabase_admin
+from logger import get_logger
 
 router = APIRouter()
+log = get_logger(__name__)
 
 
 # ---------------------------------------------------------------------------
@@ -19,16 +22,8 @@ router = APIRouter()
 # ---------------------------------------------------------------------------
 
 PRESET_NICHES = {
-    "Finance",
-    "Fitness",
-    "Beauty",
-    "Tech",
-    "Food",
-    "Travel",
-    "Gaming",
-    "Fashion",
-    "Education",
-    "Entertainment",
+    "Finance", "Fitness", "Beauty", "Tech", "Food",
+    "Travel", "Gaming", "Fashion", "Education", "Entertainment",
 }
 
 
@@ -38,18 +33,17 @@ PRESET_NICHES = {
 
 
 class ProfileInput(BaseModel):
-    full_name: str
-    platform: str
-    handle: str
-    followers: int
-    niche: str
+    full_name:       str
+    platform:        str
+    handle:          str
+    followers:       int
+    niche:           str
     engagement_rate: float
-    bio: str
-    past_sponsors: Optional[List[str]] = []
-    pricing_min: int
-    pricing_max: int
+    bio:             str
+    past_sponsors:   Optional[List[str]] = []
+    pricing_min:     int
+    pricing_max:     int
 
-    # ── handle cannot be empty ──────────────────────────────────────
     @field_validator("handle")
     @classmethod
     def handle_not_empty(cls, v: str) -> str:
@@ -58,7 +52,6 @@ class ProfileInput(BaseModel):
             raise ValueError("Handle cannot be empty.")
         return v
 
-    # ── followers must be > 0 ───────────────────────────────────────
     @field_validator("followers")
     @classmethod
     def followers_positive(cls, v: int) -> int:
@@ -66,7 +59,6 @@ class ProfileInput(BaseModel):
             raise ValueError("Followers must be greater than 0.")
         return v
 
-    # ── engagement_rate must be between 0 and 100 ───────────────────
     @field_validator("engagement_rate")
     @classmethod
     def engagement_in_range(cls, v: float) -> float:
@@ -74,9 +66,6 @@ class ProfileInput(BaseModel):
             raise ValueError("Engagement rate must be between 0 and 100.")
         return v
 
-    # ── niche: preset list OR any non-empty custom value ────────────
-    # This mirrors a frontend that shows a dropdown with an "Other /
-    # Custom" option where the user can type their own niche.
     @field_validator("niche")
     @classmethod
     def niche_valid(cls, v: str) -> str:
@@ -86,10 +75,8 @@ class ProfileInput(BaseModel):
                 "Niche cannot be empty. "
                 f"Choose one of {sorted(PRESET_NICHES)} or enter a custom niche."
             )
-        # Accept any non-empty string — preset OR custom
         return v
 
-    # ── pricing_min must be < pricing_max ───────────────────────────
     @model_validator(mode="after")
     def pricing_range_valid(self) -> "ProfileInput":
         if self.pricing_min is not None and self.pricing_max is not None:
@@ -112,26 +99,8 @@ class ProfileInput(BaseModel):
 
 @router.post("/save")
 def save_profile(data: ProfileInput, authorization: str = Header(...)):
-    """Create or update the authenticated creator's profile.
-
-    Parameters
-    ----------
-    data:
-        Validated profile payload.
-    authorization:
-        ``Authorization: Bearer <jwt>`` header.
-
-    Returns
-    -------
-    dict
-        ``{ success: true }`` on success.
-
-    Raises
-    ------
-    HTTPException 401   Invalid or expired token.
-    HTTPException 422   Pydantic validation error (handled automatically).
-    HTTPException 400   Any other error (e.g. database write failure).
-    """
+    """Create or update the authenticated creator's profile."""
+    # ── Auth ─────────────────────────────────────────────────────────
     try:
         token = authorization.replace("Bearer ", "").strip()
         if not token:
@@ -146,13 +115,18 @@ def save_profile(data: ProfileInput, authorization: str = Header(...)):
             detail=f"Invalid or expired token: {exc}",
         ) from exc
 
+    log.info("Profile save attempt | user_id=%s", user_id)
+
+    # ── Save ─────────────────────────────────────────────────────────
     try:
         supabase_admin.table("profiles").upsert({
             "user_id": user_id,
             **data.model_dump(),
         }).execute()
+        log.info("Profile saved successfully | user_id=%s", user_id)
         return {"success": True}
     except Exception as exc:
+        log.error("Profile save failed | user_id=%s | reason=%s", user_id, exc)
         raise HTTPException(
             status_code=400,
             detail=f"Failed to save profile: {exc}",
@@ -166,24 +140,8 @@ def save_profile(data: ProfileInput, authorization: str = Header(...)):
 
 @router.get("/me")
 def get_profile(authorization: str = Header(...)):
-    """Fetch the authenticated creator's profile.
-
-    Parameters
-    ----------
-    authorization:
-        ``Authorization: Bearer <jwt>`` header.
-
-    Returns
-    -------
-    dict
-        The profile row from the ``profiles`` table.
-
-    Raises
-    ------
-    HTTPException 401   Invalid or expired token.
-    HTTPException 404   No profile found for this user.
-    HTTPException 400   Any other error.
-    """
+    """Fetch the authenticated creator's profile."""
+    # ── Auth ─────────────────────────────────────────────────────────
     try:
         token = authorization.replace("Bearer ", "").strip()
         if not token:
@@ -198,6 +156,9 @@ def get_profile(authorization: str = Header(...)):
             detail=f"Invalid or expired token: {exc}",
         ) from exc
 
+    log.info("Profile fetch | user_id=%s", user_id)
+
+    # ── Fetch ─────────────────────────────────────────────────────────
     try:
         res = (
             supabase_admin

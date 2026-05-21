@@ -16,8 +16,10 @@ from fastapi import APIRouter, Header, HTTPException
 from pydantic import BaseModel
 
 from database import supabase, supabase_admin
+from logger import get_logger
 
 router = APIRouter()
+log = get_logger(__name__)
 
 # ---------------------------------------------------------------------------
 # Constants
@@ -50,7 +52,6 @@ class UpdatePitchContentRequest(BaseModel):
 
 
 def _resolve_user_id(authorization: str) -> str:
-    """Validate Bearer token and return Supabase user_id."""
     try:
         token: str = authorization.replace("Bearer ", "").strip()
         if not token:
@@ -65,25 +66,12 @@ def _resolve_user_id(authorization: str) -> str:
 
 
 def _raise_if_not_found(exc: Exception, label: str) -> None:
-    """Re-raise as 404 when Supabase .single() finds no rows."""
     msg = str(exc).lower()
     if "no rows" in msg or "json object requested" in msg:
-        raise HTTPException(
-            status_code=404,
-            detail=f"{label} not found.",
-        ) from exc
+        raise HTTPException(status_code=404, detail=f"{label} not found.") from exc
 
 
 def _get_pitch_owned_by(pitch_id: str, user_id: str) -> dict:
-    """Fetch a pitch and verify it belongs to user_id.
-
-    Returns the pitch row.
-
-    Raises
-    ------
-    HTTPException 404   Pitch not found or owned by someone else.
-    HTTPException 500   Database error.
-    """
     try:
         res = (
             supabase_admin
@@ -96,15 +84,11 @@ def _get_pitch_owned_by(pitch_id: str, user_id: str) -> dict:
         pitch: dict = res.data
     except Exception as exc:
         _raise_if_not_found(exc, f"Pitch '{pitch_id}'")
-        raise HTTPException(
-            status_code=500,
-            detail=f"Failed to fetch pitch: {exc}",
-        ) from exc
+        raise HTTPException(status_code=500, detail=f"Failed to fetch pitch: {exc}") from exc
 
     if not pitch:
         raise HTTPException(status_code=404, detail=f"Pitch '{pitch_id}' not found.")
 
-    # Return 404 (not 403) to avoid leaking existence of other users' pitches
     if pitch.get("user_id") != user_id:
         raise HTTPException(status_code=404, detail=f"Pitch '{pitch_id}' not found.")
 
@@ -120,14 +104,13 @@ def _mock_generate_pitch(
     profile: dict[str, Any],
     brand: dict[str, Any],
 ) -> dict[str, str]:
-    """Generate a personalised cold-pitch email without an API key."""
-    name:        str   = profile.get("full_name")       or "Creator"
-    platform:    str   = profile.get("platform")        or "Social Media"
-    handle:      str   = profile.get("handle")          or ""
-    niche:       str   = profile.get("niche")           or "Lifestyle"
-    followers:   int   = int(profile.get("followers")   or 0)
+    name:        str   = profile.get("full_name")          or "Creator"
+    platform:    str   = profile.get("platform")           or "Social Media"
+    handle:      str   = profile.get("handle")             or ""
+    niche:       str   = profile.get("niche")              or "Lifestyle"
+    followers:   int   = int(profile.get("followers")      or 0)
     engagement:  float = float(profile.get("engagement_rate") or 0.0)
-    past_sponsors: list = profile.get("past_sponsors")  or []
+    past_sponsors: list = profile.get("past_sponsors")     or []
 
     brand_name:  str = brand.get("name")    or "Your Brand"
     brand_niche: str = brand.get("niche")   or niche
@@ -187,17 +170,9 @@ def generate_pitch(
     data: GeneratePitchRequest,
     authorization: str = Header(...),
 ):
-    """Generate a cold-pitch email and save it as a draft.
-
-    Returns
-    -------
-    dict  { id, subject, body, status }
-
-    Raises
-    ------
-    HTTPException 401 / 404 / 500
-    """
+    """Generate a cold-pitch email and save it as a draft."""
     user_id = _resolve_user_id(authorization)
+    log.info("Pitch generation started | user_id=%s | brand_id=%s", user_id, data.brand_id)
 
     # Fetch profile
     try:
@@ -233,13 +208,17 @@ def generate_pitch(
             detail=f"Brand with id '{data.brand_id}' not found.",
         )
 
-    # Generate content
+    # Generate
     try:
         pitch_content = _mock_generate_pitch(profile, brand)
     except Exception as exc:
+        log.error(
+            "Pitch generation failed | user_id=%s | brand_id=%s | reason=%s",
+            user_id, data.brand_id, exc,
+        )
         raise HTTPException(status_code=500, detail=f"Pitch generation failed: {exc}") from exc
 
-    # Save to pitches table
+    # Save
     try:
         insert_res = (
             supabase_admin.table("pitches").insert({
@@ -251,6 +230,10 @@ def generate_pitch(
             }).execute()
         )
         saved: dict = insert_res.data[0]
+        log.info(
+            "Pitch generated and saved successfully | user_id=%s | pitch_id=%s",
+            user_id, saved["id"],
+        )
     except Exception as exc:
         raise HTTPException(status_code=500, detail=f"Failed to save pitch: {exc}") from exc
 
@@ -269,17 +252,7 @@ def generate_pitch(
 
 @router.get("/mine")
 def get_my_pitches(authorization: str = Header(...)):
-    """Return all pitches for the authenticated creator, with brand name.
-
-    Returns
-    -------
-    list[dict]
-        Each item includes all pitch columns plus ``brands: { name }``.
-
-    Raises
-    ------
-    HTTPException 401 / 500
-    """
+    """Return all pitches for the authenticated creator, with brand name."""
     user_id = _resolve_user_id(authorization)
 
     try:
@@ -310,19 +283,7 @@ def update_pitch_status(
     data: UpdatePitchRequest,
     authorization: str = Header(...),
 ):
-    """Update the status of a pitch owned by the authenticated creator.
-
-    Allowed status values: draft | sent | replied | deal
-
-    Returns
-    -------
-    dict
-        The full updated pitch row.
-
-    Raises
-    ------
-    HTTPException 401 / 422 / 404 / 500
-    """
+    """Update the status of a pitch owned by the authenticated creator."""
     user_id = _resolve_user_id(authorization)
 
     if data.status not in ALLOWED_STATUSES:
@@ -334,7 +295,6 @@ def update_pitch_status(
             ),
         )
 
-    # Verify ownership (raises 404 if not found or not owned)
     _get_pitch_owned_by(pitch_id, user_id)
 
     try:
@@ -344,6 +304,10 @@ def update_pitch_status(
             .update({"status": data.status})
             .eq("id", pitch_id)
             .execute()
+        )
+        log.info(
+            "Pitch status updated | pitch_id=%s | new_status=%s | user_id=%s",
+            pitch_id, data.status, user_id,
         )
         return result.data[0]
     except Exception as exc:
@@ -364,35 +328,9 @@ def update_pitch_content(
     data: UpdatePitchContentRequest,
     authorization: str = Header(...),
 ):
-    """Edit the subject and/or body of an existing pitch.
-
-    Only the fields explicitly provided in the request body are updated.
-    At least one of ``subject`` or ``body`` must be supplied.
-
-    Parameters
-    ----------
-    pitch_id:
-        UUID of the pitch to edit.
-    data:
-        JSON body with optional ``subject`` and/or ``body`` fields.
-    authorization:
-        ``Authorization: Bearer <jwt>`` header.
-
-    Returns
-    -------
-    dict
-        The full updated pitch row.
-
-    Raises
-    ------
-    HTTPException 400   Neither subject nor body provided.
-    HTTPException 401   Invalid or expired token.
-    HTTPException 404   Pitch not found or not owned by caller.
-    HTTPException 500   Database update failed.
-    """
+    """Edit the subject and/or body of an existing pitch."""
     user_id = _resolve_user_id(authorization)
 
-    # Build update payload from only provided fields
     updates: dict[str, str] = {}
     if data.subject is not None:
         updates["subject"] = data.subject.strip()
@@ -405,10 +343,8 @@ def update_pitch_content(
             detail="At least one of 'subject' or 'body' must be provided.",
         )
 
-    # Verify pitch exists and belongs to this user
     _get_pitch_owned_by(pitch_id, user_id)
 
-    # Apply update
     try:
         result = (
             supabase_admin
@@ -416,6 +352,10 @@ def update_pitch_content(
             .update(updates)
             .eq("id", pitch_id)
             .execute()
+        )
+        log.info(
+            "Pitch content edited | pitch_id=%s | fields=%s | user_id=%s",
+            pitch_id, list(updates.keys()), user_id,
         )
         return result.data[0]
     except Exception as exc:

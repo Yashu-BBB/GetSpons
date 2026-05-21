@@ -19,9 +19,11 @@ from pydantic import BaseModel
 
 from ai import generate_mediakit_content
 from database import supabase, supabase_admin
+from logger import get_logger
 from pdf import generate_pdf
 
 router = APIRouter()
+log = get_logger(__name__)
 
 
 # ---------------------------------------------------------------------------
@@ -30,7 +32,6 @@ router = APIRouter()
 
 
 def _resolve_user_id(authorization: str) -> str:
-    """Validate Bearer token and return Supabase user_id."""
     try:
         token: str = authorization.replace("Bearer ", "").strip()
         if not token:
@@ -45,7 +46,6 @@ def _resolve_user_id(authorization: str) -> str:
 
 
 def _fetch_profile(user_id: str) -> dict:
-    """Fetch creator profile row for user_id."""
     try:
         result = (
             supabase_admin
@@ -77,13 +77,12 @@ def _fetch_profile(user_id: str) -> dict:
 
 
 def _no_rows(exc: Exception) -> bool:
-    """Return True when a Supabase .single() exception means no rows found."""
     msg = str(exc).lower()
     return "no rows" in msg or "json object requested" in msg
 
 
 # ---------------------------------------------------------------------------
-# Request model for PATCH /mediakit/update
+# Request model
 # ---------------------------------------------------------------------------
 
 
@@ -105,39 +104,21 @@ class MediakitUpdateInput(BaseModel):
 
 @router.post("/generate")
 def generate_mediakit(authorization: str = Header(...)):
-    """Generate AI media-kit content and upsert it to the mediakits table.
-
-    Flow
-    ----
-    1. Validate JWT → user_id.
-    2. Fetch creator profile.
-    3. Run AI content generation.
-    4. Upsert into mediakits (on_conflict = user_id).
-    5. Return the generated JSON.
-
-    Returns
-    -------
-    dict
-        Keys: headline, bio_short, key_stats, audience_description,
-        content_style, why_partner, pricing_table, cta.
-
-    Raises
-    ------
-    HTTPException 401 / 404 / 500
-    """
+    """Generate AI media-kit content and upsert it to the mediakits table."""
     user_id = _resolve_user_id(authorization)
     profile = _fetch_profile(user_id)
 
-    # ── Generate ─────────────────────────────────────────────────────
+    log.info("Media kit generation started | user_id=%s", user_id)
+
     try:
         mediakit: dict = generate_mediakit_content(profile)
     except Exception as exc:
+        log.error("Media kit generation failed | user_id=%s | reason=%s", user_id, exc)
         raise HTTPException(
             status_code=500,
             detail=f"Media kit generation failed: {exc}",
         ) from exc
 
-    # ── Upsert ───────────────────────────────────────────────────────
     try:
         now = datetime.now(timezone.utc).isoformat()
         supabase_admin.table("mediakits").upsert(
@@ -155,7 +136,9 @@ def generate_mediakit(authorization: str = Header(...)):
             },
             on_conflict="user_id",
         ).execute()
+        log.info("Media kit generated and saved successfully | user_id=%s", user_id)
     except Exception as exc:
+        log.error("Media kit save failed | user_id=%s | reason=%s", user_id, exc)
         raise HTTPException(
             status_code=500,
             detail=f"Failed to save media kit: {exc}",
@@ -171,17 +154,7 @@ def generate_mediakit(authorization: str = Header(...)):
 
 @router.get("/saved")
 def get_saved_mediakit(authorization: str = Header(...)):
-    """Fetch the saved media kit for the authenticated user.
-
-    Returns
-    -------
-    dict
-        The full mediakits row.
-
-    Raises
-    ------
-    HTTPException 401 / 404 / 500
-    """
+    """Fetch the saved media kit for the authenticated user."""
     user_id = _resolve_user_id(authorization)
 
     try:
@@ -224,47 +197,18 @@ def update_mediakit(
     data: MediakitUpdateInput,
     authorization: str = Header(...),
 ):
-    """Partially update the saved media kit for the authenticated user.
-
-    Only fields explicitly provided in the request body are written.
-    ``updated_at`` is always refreshed automatically.
-
-    Parameters
-    ----------
-    data:
-        Any subset of: headline, bio_short, audience_description,
-        content_style, why_partner, cta, key_stats, pricing_table.
-
-    Returns
-    -------
-    dict
-        The full updated mediakits row.
-
-    Raises
-    ------
-    HTTPException 400   No fields provided.
-    HTTPException 401   Bad token.
-    HTTPException 404   No saved media kit to update.
-    HTTPException 500   Database error.
-    """
+    """Partially update the saved media kit for the authenticated user."""
     user_id = _resolve_user_id(authorization)
 
-    # Build payload from only the fields that were actually provided
     updates: dict[str, Any] = {
-        k: v
-        for k, v in data.model_dump().items()
-        if v is not None
+        k: v for k, v in data.model_dump().items() if v is not None
     }
 
     if not updates:
-        raise HTTPException(
-            status_code=400,
-            detail="No fields provided to update.",
-        )
+        raise HTTPException(status_code=400, detail="No fields provided to update.")
 
     updates["updated_at"] = datetime.now(timezone.utc).isoformat()
 
-    # Verify a saved mediakit exists before attempting update
     try:
         existing = (
             supabase_admin
@@ -291,7 +235,6 @@ def update_mediakit(
             detail="No saved media kit found. Generate one first.",
         )
 
-    # Apply update
     try:
         result = (
             supabase_admin
@@ -315,25 +258,12 @@ def update_mediakit(
 
 @router.post("/pdf")
 def generate_mediakit_pdf(authorization: str = Header(...)):
-    """Generate and return the media kit as a downloadable PDF.
-
-    Prefers saved mediakit content; falls back to fresh generation if none
-    exists yet. Profile fields (name, platform, handle) are always pulled
-    from the profiles table.
-
-    Returns
-    -------
-    Response
-        application/pdf with Content-Disposition: attachment.
-
-    Raises
-    ------
-    HTTPException 401 / 404 / 500
-    """
+    """Generate and return the media kit as a downloadable PDF."""
     user_id = _resolve_user_id(authorization)
     profile = _fetch_profile(user_id)
 
-    # Prefer saved content, fall back to fresh generation
+    log.info("PDF generation started | user_id=%s", user_id)
+
     mediakit: dict = {}
     try:
         saved_res = (
@@ -352,6 +282,7 @@ def generate_mediakit_pdf(authorization: str = Header(...)):
         try:
             mediakit = generate_mediakit_content(profile)
         except Exception as exc:
+            log.error("PDF generation failed (AI step) | user_id=%s | reason=%s", user_id, exc)
             raise HTTPException(
                 status_code=500,
                 detail=f"Media kit generation failed: {exc}",
@@ -373,7 +304,9 @@ def generate_mediakit_pdf(authorization: str = Header(...)):
 
     try:
         pdf_bytes: bytes = generate_pdf(template_data)
+        log.info("PDF generated successfully | user_id=%s", user_id)
     except Exception as exc:
+        log.error("PDF generation failed (render step) | user_id=%s | reason=%s", user_id, exc)
         raise HTTPException(
             status_code=500,
             detail=f"PDF rendering failed: {exc}",
