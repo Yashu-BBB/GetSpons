@@ -1,3 +1,73 @@
 2026-05-21 13:24:11 | INFO     | getspons.main | → GET /health | ip=127.0.0.1
 2026-05-21 13:24:11 | DEBUG    | getspons.main | Health check called
 2026-05-21 13:24:11 | INFO     | getspons.main | ← GET /health | status=200 | 8.1ms
+2026-05-21 13:59:35 | INFO     | getspons.main | → POST /api/auth/login | ip=127.0.0.1
+2026-05-21 13:59:35 | INFO     | getspons.auth | Login attempt | email=test@test.com
+2026-05-21 13:59:36 | WARNING  | getspons.auth | Login failed | email=test@test.com | reason=Invalid login credentials
+2026-05-21 13:59:36 | INFO     | getspons.main | ← POST /api/auth/login | status=200 | 1630.7ms
+2026-05-21 13:59:36 | INFO     | getspons.main | → POST /api/auth/login | ip=127.0.0.1
+2026-05-21 13:59:36 | INFO     | getspons.auth | Login attempt | email=test@test.com
+2026-05-21 13:59:36 | WARNING  | getspons.auth | Login failed | email=test@test.com | reason=Invalid login credentials
+2026-05-21 13:59:36 | INFO     | getspons.main | ← POST /api/auth/login | status=200 | 182.3ms
+2026-05-21 13:59:36 | INFO     | getspons.main | → POST /api/auth/login | ip=127.0.0.1
+2026-05-21 13:59:37 | INFO     | getspons.auth | Login attempt | email=test@test.com
+2026-05-21 13:59:37 | WARNING  | getspons.auth | Login failed | email=test@test.com | reason=Invalid login credentials
+2026-05-21 13:59:37 | INFO     | getspons.main | ← POST /api/auth/login | status=200 | 289.0ms
+2026-05-21 13:59:37 | INFO     | getspons.main | → POST /api/auth/login | ip=127.0.0.1
+2026-05-21 13:59:37 | INFO     | getspons.auth | Login attempt | email=test@test.com
+2026-05-21 13:59:37 | WARNING  | getspons.auth | Login failed | email=test@test.com | reason=Invalid login credentials
+2026-05-21 13:59:37 | INFO     | getspons.main | ← POST /api/auth/login | status=200 | 190.4ms
+2026-05-21 13:59:37 | INFO     | getspons.main | → POST /api/auth/login | ip=127.0.0.1
+2026-05-21 13:59:37 | INFO     | getspons.auth | Login attempt | email=test@test.com
+2026-05-21 13:59:37 | WARNING  | getspons.auth | Login failed | email=test@test.com | reason=Invalid login credentials
+2026-05-21 13:59:37 | INFO     | getspons.main | ← POST /api/auth/login | status=200 | 158.1ms
+2026-05-21 13:59:37 | INFO     | getspons.main | → POST /api/auth/login | ip=127.0.0.1
+2026-05-21 13:59:37 | INFO     | getspons.auth | Login attempt | email=test@test.com
+2026-05-21 13:59:37 | WARNING  | getspons.auth | Login failed | email=test@test.com | reason=Invalid login credentials
+2026-05-21 13:59:37 | INFO     | getspons.main | ← POST /api/auth/login | status=200 | 168.8ms
+2026-05-21 14:00:13 | INFO     | getspons.main | → POST /api/auth/login | ip=127.0.0.1
+2026-05-21 14:00:13 | INFO     | getspons.auth | Login attempt | email=test@test.com
+2026-05-21 14:00:14 | WARNING  | getspons.auth | Login failed | email=test@test.com | reason=Invalid login credentials
+2026-05-21 14:00:14 | INFO     | getspons.main | ← POST /api/auth/login | status=200 | 614.8ms
+2026-05-21 14:00:14 | INFO     | getspons.main | → POST /api/auth/login | ip=127.0.0.1
+2026-05-21 14:00:14 | INFO     | getspons.auth | Login attempt | email=test@test.com
+2026-05-21 14:00:14 | WARNING  | getspons.auth | Login failed | email=test@test.com | reason=Invalid login credentials
+2026-05-21 14:00:14 | INFO     | getspons.main | ← POST /api/auth/login | status=200 | 115.4ms
+2026-05-21 14:00:14 | INFO     | getspons.main | → POST /api/auth/login | ip=127.0.0.1
+2026-05-21 14:00:14 | INFO     | getspons.auth | Login attempt | email=test@test.com
+2026-05-21 14:00:14 | WARNING  | getspons.auth | Login failed | email=test@test.com | reason=Invalid login credentials
+2026-05-21 14:00:14 | INFO     | getspons.main | ← POST /api/auth/login | status=200 | 356.9ms
+2026-05-21 14:00:14 | INFO     | getspons.main | → POST /api/auth/login | ip=127.0.0.1
+2026-05-21 14:00:14 | INFO     | getspons.auth | Login attempt | email=test@test.com
+2026-05-21 14:00:14 | WARNING  | getspons.auth | Login failed | email=test@test.com | reason=Invalid login credentials
+2026-05-21 14:00:14 | INFO     | getspons.main | ← POST /api/auth/login | status=200 | 131.6ms
+2026-05-21 14:00:14 | INFO     | getspons.main | → POST /api/auth/login | ip=127.0.0.1
+2026-05-21 14:00:14 | INFO     | getspons.auth | Login attempt | email=test@test.com
+2026-05-21 14:00:15 | WARNING  | getspons.auth | Login failed | email=test@test.com | reason=Invalid login credentials
+2026-05-21 14:00:15 | INFO     | getspons.main | ← POST /api/auth/login | status=200 | 123.8ms
+2026-05-21 14:00:15 | INFO     | getspons.main | → POST /api/auth/login | ip=127.0.0.1
+2026-05-21 14:00:15 | INFO     | getspons.auth | Login attempt | email=test@test.com
+2026-05-21 14:00:15 | WARNING  | getspons.auth | Login failed | email=test@test.com | reason=Invalid login credentials
+2026-05-21 14:00:15 | INFO     | getspons.main | ← POST /api/auth/login | status=200 | 165.8ms
+2026-05-21 14:00:15 | INFO     | getspons.main | → POST /api/auth/login | ip=127.0.0.1
+2026-05-21 14:00:15 | INFO     | getspons.auth | Login attempt | email=test@test.com
+2026-05-21 14:00:15 | WARNING  | getspons.auth | Login failed | email=test@test.com | reason=Invalid login credentials
+2026-05-21 14:00:15 | INFO     | getspons.main | ← POST /api/auth/login | status=200 | 185.0ms
+2026-05-21 14:00:15 | INFO     | getspons.main | → POST /api/auth/login | ip=127.0.0.1
+2026-05-21 14:00:15 | INFO     | getspons.auth | Login attempt | email=test@test.com
+2026-05-21 14:00:15 | WARNING  | getspons.auth | Login failed | email=test@test.com | reason=Invalid login credentials
+2026-05-21 14:00:15 | INFO     | getspons.main | ← POST /api/auth/login | status=200 | 146.7ms
+2026-05-21 14:00:15 | INFO     | getspons.main | → POST /api/auth/login | ip=127.0.0.1
+2026-05-21 14:00:15 | INFO     | getspons.auth | Login attempt | email=test@test.com
+2026-05-21 14:00:15 | WARNING  | getspons.auth | Login failed | email=test@test.com | reason=Invalid login credentials
+2026-05-21 14:00:15 | INFO     | getspons.main | ← POST /api/auth/login | status=200 | 112.1ms
+2026-05-21 14:00:15 | INFO     | getspons.main | → POST /api/auth/login | ip=127.0.0.1
+2026-05-21 14:00:15 | INFO     | getspons.auth | Login attempt | email=test@test.com
+2026-05-21 14:00:15 | WARNING  | getspons.auth | Login failed | email=test@test.com | reason=Invalid login credentials
+2026-05-21 14:00:15 | INFO     | getspons.main | ← POST /api/auth/login | status=200 | 144.8ms
+2026-05-21 14:00:15 | INFO     | getspons.main | → POST /api/auth/login | ip=127.0.0.1
+2026-05-21 14:00:15 | WARNING  | getspons.main | Rate limit hit | ip=127.0.0.1 | path=/api/auth/login | limit=10 per 1 hour
+2026-05-21 14:00:15 | INFO     | getspons.main | ← POST /api/auth/login | status=429 | 12.1ms
+2026-05-21 14:00:16 | INFO     | getspons.main | → POST /api/auth/login | ip=127.0.0.1
+2026-05-21 14:00:16 | WARNING  | getspons.main | Rate limit hit | ip=127.0.0.1 | path=/api/auth/login | limit=10 per 1 hour
+2026-05-21 14:00:16 | INFO     | getspons.main | ← POST /api/auth/login | status=429 | 7.0ms

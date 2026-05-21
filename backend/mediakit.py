@@ -13,10 +13,10 @@ from __future__ import annotations
 from datetime import datetime, timezone
 from typing import Any, List, Optional
 
-from fastapi import APIRouter, Header, HTTPException
+from fastapi import APIRouter, Header, HTTPException, Request
 from fastapi.responses import Response
 from pydantic import BaseModel
-
+from limiter import limiter
 from ai import generate_mediakit_content
 from database import supabase, supabase_admin
 from logger import get_logger
@@ -103,7 +103,8 @@ class MediakitUpdateInput(BaseModel):
 
 
 @router.post("/generate")
-def generate_mediakit(authorization: str = Header(...)):
+@limiter.limit("10/hour")
+def generate_mediakit(request: Request,authorization: str = Header(...)):
     """Generate AI media-kit content and upsert it to the mediakits table."""
     user_id = _resolve_user_id(authorization)
     profile = _fetch_profile(user_id)
@@ -257,7 +258,8 @@ def update_mediakit(
 
 
 @router.post("/pdf")
-def generate_mediakit_pdf(authorization: str = Header(...)):
+@limiter.limit("5/hour")
+def generate_mediakit_pdf(request: Request,authorization: str = Header(...)):
     """Generate and return the media kit as a downloadable PDF."""
     user_id = _resolve_user_id(authorization)
     profile = _fetch_profile(user_id)

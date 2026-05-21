@@ -8,9 +8,9 @@ Exposes:
     POST /auth/reset-password    Set a new password using a reset token.
 """
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Request
 from pydantic import BaseModel, EmailStr
-
+from limiter import limiter
 from database import supabase
 from logger import get_logger
 
@@ -43,7 +43,8 @@ class ResetPasswordInput(BaseModel):
 
 
 @router.post("/signup")
-def signup(data: AuthInput):
+@limiter.limit("5/hour")
+def signup(request: Request,data: AuthInput):
     log.info("Signup attempt | email=%s", data.email)
     try:
         res = supabase.auth.sign_up({
@@ -64,7 +65,8 @@ def signup(data: AuthInput):
 
 
 @router.post("/login")
-def login(data: AuthInput):
+@limiter.limit("10/hour")
+def login(request: Request,data: AuthInput):
     log.info("Login attempt | email=%s", data.email)
     try:
         res = supabase.auth.sign_in_with_password({
@@ -88,7 +90,8 @@ def login(data: AuthInput):
 
 
 @router.post("/forgot-password")
-def forgot_password(data: ForgotPasswordInput):
+@limiter.limit("3/hour")
+def forgot_password(request: Request,data: ForgotPasswordInput):
     log.info("Password reset requested | email=%s", data.email)
     try:
         supabase.auth.reset_password_email(data.email)

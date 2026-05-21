@@ -6,9 +6,9 @@ Exposes:
     GET /brands/{brand_id}   Full brand detail.
 """
 
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, HTTPException, Query, Request
 from typing import Optional
-
+from limiter import limiter
 from database import supabase_admin
 from logger import get_logger
 
@@ -39,7 +39,9 @@ _DETAIL_COLUMNS = (
 
 
 @router.get("/", response_model=None)
+@limiter.limit("60/hour")
 def get_brands(
+    request: Request,
     niche: Optional[str] = Query(default=None),
     min_followers: Optional[int] = Query(default=None, ge=0),
 ):

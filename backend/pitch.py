@@ -12,9 +12,9 @@ from __future__ import annotations
 
 from typing import Any, Optional
 
-from fastapi import APIRouter, Header, HTTPException
+from fastapi import APIRouter, Header, HTTPException, Request
 from pydantic import BaseModel
-
+from limiter import limiter
 from database import supabase, supabase_admin
 from logger import get_logger
 
@@ -166,7 +166,9 @@ Looking forward to hearing from you,
 
 
 @router.post("/generate")
+@limiter.limit("20/hour")
 def generate_pitch(
+    request: Request,
     data: GeneratePitchRequest,
     authorization: str = Header(...),
 ):
