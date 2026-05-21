@@ -2,18 +2,31 @@
 brands.py — Brands router for GetSpons.
 
 Exposes:
-    GET /brands              Lightweight list with optional filters.
-    GET /brands/{brand_id}   Full brand detail.
+    GET /brands              Lightweight list with optional filters. Cached 600s.
+    GET /brands/{brand_id}   Full brand detail. Cached 600s.
+
+Caching
+-------
+    List   key: "brands_list_{niche}_{min_followers}"
+    Detail key: "brand_detail_{brand_id}"
+    TTL: 600 seconds (10 minutes)
+
+    Cache is automatically invalidated via cache.clear_pattern("brands_")
+    whenever brand data changes (call this from any future write endpoint).
 """
 
 from fastapi import APIRouter, HTTPException, Query, Request
 from typing import Optional
-from limiter import limiter
+
+from cache import cache
 from database import supabase_admin
+from limiter import limiter
 from logger import get_logger
 
 router = APIRouter()
 log = get_logger(__name__)
+
+_BRANDS_TTL = 600   # 10 minutes
 
 # ---------------------------------------------------------------------------
 # Column sets
@@ -34,7 +47,7 @@ _DETAIL_COLUMNS = (
 
 
 # ---------------------------------------------------------------------------
-# GET /brands
+# GET /brands  — lightweight list, cached
 # ---------------------------------------------------------------------------
 
 
@@ -45,13 +58,23 @@ def get_brands(
     niche: Optional[str] = Query(default=None),
     min_followers: Optional[int] = Query(default=None, ge=0),
 ):
-    """Return a lightweight list of brands with optional filtering."""
+    """Return a lightweight list of brands with optional filtering.
+
+    Results are cached for 600 seconds keyed on the active filters.
+    """
+    cache_key = f"brands_list_{niche}_{min_followers}"
+
+    # ── Cache hit ─────────────────────────────────────────────────────
+    cached = cache.get(cache_key)
+    if cached is not None:
+        return cached
+
+    # ── Cache miss — query Supabase ───────────────────────────────────
     filters = []
     if niche:
         filters.append(f"niche={niche}")
     if min_followers is not None:
         filters.append(f"min_followers<={min_followers}")
-
     filter_str = ", ".join(filters) if filters else "none"
     log.info("Brands list fetched | filters=[%s]", filter_str)
 
@@ -64,7 +87,7 @@ def get_brands(
             query = query.lte("min_followers", min_followers)
 
         result = query.execute()
-        return result.data or []
+        data = result.data or []
 
     except Exception as exc:
         raise HTTPException(
@@ -72,15 +95,26 @@ def get_brands(
             detail=f"Failed to fetch brands: {exc}",
         ) from exc
 
+    cache.set(cache_key, data, ttl_seconds=_BRANDS_TTL)
+    return data
+
 
 # ---------------------------------------------------------------------------
-# GET /brands/{brand_id}
+# GET /brands/{brand_id}  — full detail, cached
 # ---------------------------------------------------------------------------
 
 
 @router.get("/{brand_id}", response_model=None)
 def get_brand(brand_id: str):
-    """Return full detail for a single brand."""
+    """Return full detail for a single brand. Cached for 600 seconds."""
+    cache_key = f"brand_detail_{brand_id}"
+
+    # ── Cache hit ─────────────────────────────────────────────────────
+    cached = cache.get(cache_key)
+    if cached is not None:
+        return cached
+
+    # ── Cache miss — query Supabase ───────────────────────────────────
     try:
         result = (
             supabase_admin
@@ -99,6 +133,7 @@ def get_brand(brand_id: str):
             )
 
         log.info("Single brand fetched | brand_id=%s", brand_id)
+        cache.set(cache_key, result.data, ttl_seconds=_BRANDS_TTL)
         return result.data
 
     except HTTPException:

@@ -4,18 +4,25 @@ profile.py — Creator profile router for GetSpons.
 Exposes:
     POST /profile/save   Create or update the authenticated creator's profile.
     GET  /profile/me     Fetch the authenticated creator's profile.
+
+Caching
+-------
+    GET /profile/me  key: "profile_{user_id}"  TTL: 300s
+    Cache is cleared on every successful POST /profile/save.
 """
 
 from fastapi import APIRouter, Header, HTTPException
 from pydantic import BaseModel, field_validator, model_validator
 from typing import Optional, List
 
+from cache import cache
 from database import supabase, supabase_admin
 from logger import get_logger
 
 router = APIRouter()
 log = get_logger(__name__)
 
+_PROFILE_TTL = 300   # 5 minutes
 
 # ---------------------------------------------------------------------------
 # Constants
@@ -99,7 +106,11 @@ class ProfileInput(BaseModel):
 
 @router.post("/save")
 def save_profile(data: ProfileInput, authorization: str = Header(...)):
-    """Create or update the authenticated creator's profile."""
+    """Create or update the authenticated creator's profile.
+
+    Clears the profile cache for this user on success so the next
+    GET /profile/me fetches fresh data.
+    """
     # ── Auth ─────────────────────────────────────────────────────────
     try:
         token = authorization.replace("Bearer ", "").strip()
@@ -123,8 +134,12 @@ def save_profile(data: ProfileInput, authorization: str = Header(...)):
             "user_id": user_id,
             **data.model_dump(),
         }).execute()
+
+        # Invalidate cached profile so next read is fresh
+        cache.delete(f"profile_{user_id}")
         log.info("Profile saved successfully | user_id=%s", user_id)
         return {"success": True}
+
     except Exception as exc:
         log.error("Profile save failed | user_id=%s | reason=%s", user_id, exc)
         raise HTTPException(
@@ -140,7 +155,7 @@ def save_profile(data: ProfileInput, authorization: str = Header(...)):
 
 @router.get("/me")
 def get_profile(authorization: str = Header(...)):
-    """Fetch the authenticated creator's profile."""
+    """Fetch the authenticated creator's profile. Cached for 300 seconds."""
     # ── Auth ─────────────────────────────────────────────────────────
     try:
         token = authorization.replace("Bearer ", "").strip()
@@ -156,9 +171,16 @@ def get_profile(authorization: str = Header(...)):
             detail=f"Invalid or expired token: {exc}",
         ) from exc
 
+    cache_key = f"profile_{user_id}"
+
+    # ── Cache hit ─────────────────────────────────────────────────────
+    cached = cache.get(cache_key)
+    if cached is not None:
+        return cached
+
+    # ── Cache miss — query Supabase ───────────────────────────────────
     log.info("Profile fetch | user_id=%s", user_id)
 
-    # ── Fetch ─────────────────────────────────────────────────────────
     try:
         res = (
             supabase_admin
@@ -173,7 +195,10 @@ def get_profile(authorization: str = Header(...)):
                 status_code=404,
                 detail="No profile found. Please complete your creator profile first.",
             )
+
+        cache.set(cache_key, res.data, ttl_seconds=_PROFILE_TTL)
         return res.data
+
     except HTTPException:
         raise
     except Exception as exc:

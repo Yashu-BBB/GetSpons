@@ -6,6 +6,12 @@ Exposes:
     GET   /mediakit/saved      Fetch the saved mediakit for the logged-in user.
     PATCH /mediakit/update     Partially update saved mediakit fields.
     POST  /mediakit/pdf        Generate and return the mediakit as a PDF.
+
+Caching
+-------
+    GET /mediakit/saved  key: "mediakit_{user_id}"  TTL: 300s
+    Cache is cleared on every successful PATCH /mediakit/update
+    and on every successful POST /mediakit/generate.
 """
 
 from __future__ import annotations
@@ -16,14 +22,18 @@ from typing import Any, List, Optional
 from fastapi import APIRouter, Header, HTTPException, Request
 from fastapi.responses import Response
 from pydantic import BaseModel
-from limiter import limiter
+
 from ai import generate_mediakit_content
+from cache import cache
 from database import supabase, supabase_admin
+from limiter import limiter
 from logger import get_logger
 from pdf import generate_pdf
 
 router = APIRouter()
 log = get_logger(__name__)
+
+_MEDIAKIT_TTL = 300   # 5 minutes
 
 
 # ---------------------------------------------------------------------------
@@ -104,13 +114,14 @@ class MediakitUpdateInput(BaseModel):
 
 @router.post("/generate")
 @limiter.limit("10/hour")
-def generate_mediakit(request: Request,authorization: str = Header(...)):
-    """Generate AI media-kit content and upsert it to the mediakits table."""
+def generate_mediakit(request: Request, authorization: str = Header(...)):
+    """Generate AI media-kit content, upsert to DB, and invalidate cache."""
     user_id = _resolve_user_id(authorization)
     profile = _fetch_profile(user_id)
 
     log.info("Media kit generation started | user_id=%s", user_id)
 
+    # ── Generate ─────────────────────────────────────────────────────
     try:
         mediakit: dict = generate_mediakit_content(profile)
     except Exception as exc:
@@ -120,6 +131,7 @@ def generate_mediakit(request: Request,authorization: str = Header(...)):
             detail=f"Media kit generation failed: {exc}",
         ) from exc
 
+    # ── Upsert ───────────────────────────────────────────────────────
     try:
         now = datetime.now(timezone.utc).isoformat()
         supabase_admin.table("mediakits").upsert(
@@ -137,7 +149,11 @@ def generate_mediakit(request: Request,authorization: str = Header(...)):
             },
             on_conflict="user_id",
         ).execute()
+
+        # Invalidate cache so next GET /saved returns fresh data
+        cache.delete(f"mediakit_{user_id}")
         log.info("Media kit generated and saved successfully | user_id=%s", user_id)
+
     except Exception as exc:
         log.error("Media kit save failed | user_id=%s | reason=%s", user_id, exc)
         raise HTTPException(
@@ -155,9 +171,16 @@ def generate_mediakit(request: Request,authorization: str = Header(...)):
 
 @router.get("/saved")
 def get_saved_mediakit(authorization: str = Header(...)):
-    """Fetch the saved media kit for the authenticated user."""
+    """Fetch the saved media kit for the authenticated user. Cached 300s."""
     user_id = _resolve_user_id(authorization)
+    cache_key = f"mediakit_{user_id}"
 
+    # ── Cache hit ─────────────────────────────────────────────────────
+    cached = cache.get(cache_key)
+    if cached is not None:
+        return cached
+
+    # ── Cache miss — query Supabase ───────────────────────────────────
     try:
         result = (
             supabase_admin
@@ -185,6 +208,7 @@ def get_saved_mediakit(authorization: str = Header(...)):
             detail="No saved media kit found. Generate one first.",
         )
 
+    cache.set(cache_key, data, ttl_seconds=_MEDIAKIT_TTL)
     return data
 
 
@@ -198,7 +222,7 @@ def update_mediakit(
     data: MediakitUpdateInput,
     authorization: str = Header(...),
 ):
-    """Partially update the saved media kit for the authenticated user."""
+    """Partially update the saved media kit and invalidate its cache entry."""
     user_id = _resolve_user_id(authorization)
 
     updates: dict[str, Any] = {
@@ -210,6 +234,7 @@ def update_mediakit(
 
     updates["updated_at"] = datetime.now(timezone.utc).isoformat()
 
+    # Verify saved mediakit exists
     try:
         existing = (
             supabase_admin
@@ -236,6 +261,7 @@ def update_mediakit(
             detail="No saved media kit found. Generate one first.",
         )
 
+    # Apply update
     try:
         result = (
             supabase_admin
@@ -244,7 +270,11 @@ def update_mediakit(
             .eq("user_id", user_id)
             .execute()
         )
+
+        # Invalidate cache so next GET /saved returns the updated data
+        cache.delete(f"mediakit_{user_id}")
         return result.data[0]
+
     except Exception as exc:
         raise HTTPException(
             status_code=500,
@@ -259,26 +289,33 @@ def update_mediakit(
 
 @router.post("/pdf")
 @limiter.limit("5/hour")
-def generate_mediakit_pdf(request: Request,authorization: str = Header(...)):
-    """Generate and return the media kit as a downloadable PDF."""
+def generate_mediakit_pdf(request: Request, authorization: str = Header(...)):
+    """Generate and return the media kit as a downloadable PDF.
+
+    Prefers saved (and cached) mediakit content; falls back to fresh
+    generation if none exists.
+    """
     user_id = _resolve_user_id(authorization)
     profile = _fetch_profile(user_id)
 
     log.info("PDF generation started | user_id=%s", user_id)
 
-    mediakit: dict = {}
-    try:
-        saved_res = (
-            supabase_admin
-            .table("mediakits")
-            .select("*")
-            .eq("user_id", user_id)
-            .single()
-            .execute()
-        )
-        mediakit = saved_res.data or {}
-    except Exception:
-        pass
+    # Try cache first, then DB, then generate fresh
+    mediakit: dict = cache.get(f"mediakit_{user_id}") or {}
+
+    if not mediakit:
+        try:
+            saved_res = (
+                supabase_admin
+                .table("mediakits")
+                .select("*")
+                .eq("user_id", user_id)
+                .single()
+                .execute()
+            )
+            mediakit = saved_res.data or {}
+        except Exception:
+            pass
 
     if not mediakit:
         try:

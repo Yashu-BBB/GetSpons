@@ -71,3 +71,26 @@
 2026-05-21 14:00:16 | INFO     | getspons.main | → POST /api/auth/login | ip=127.0.0.1
 2026-05-21 14:00:16 | WARNING  | getspons.main | Rate limit hit | ip=127.0.0.1 | path=/api/auth/login | limit=10 per 1 hour
 2026-05-21 14:00:16 | INFO     | getspons.main | ← POST /api/auth/login | status=429 | 7.0ms
+2026-05-21 18:44:51 | INFO     | getspons.main | → GET /api/brands | ip=127.0.0.1
+2026-05-21 18:44:51 | INFO     | getspons.main | ← GET /api/brands | status=307 | 2.0ms
+2026-05-21 18:44:51 | INFO     | getspons.main | → GET /api/brands/ | ip=127.0.0.1
+2026-05-21 18:44:51 | DEBUG    | getspons.cache | Cache MISS | key=brands_list_None_None
+2026-05-21 18:44:51 | INFO     | getspons.brands | Brands list fetched | filters=[none]
+2026-05-21 18:44:53 | DEBUG    | getspons.cache | Cache SET | key=brands_list_None_None | ttl=600s
+2026-05-21 18:44:53 | WARNING  | getspons.main | ← GET /api/brands/ | status=200 | 2334.9ms  ⚠ SLOW REQUEST
+2026-05-21 18:44:53 | INFO     | getspons.main | → GET /api/brands | ip=127.0.0.1
+2026-05-21 18:44:53 | INFO     | getspons.main | ← GET /api/brands | status=307 | 1.4ms
+2026-05-21 18:44:53 | INFO     | getspons.main | → GET /api/brands/ | ip=127.0.0.1
+2026-05-21 18:44:53 | DEBUG    | getspons.cache | Cache HIT | key=brands_list_None_None
+2026-05-21 18:44:53 | INFO     | getspons.main | ← GET /api/brands/ | status=200 | 7.1ms
+2026-05-21 18:44:53 | INFO     | getspons.main | → POST /api/admin/cache/clear | ip=127.0.0.1
+2026-05-21 18:44:53 | INFO     | getspons.cache | Cache CLEAR_ALL | removed=1 entries
+2026-05-21 18:44:53 | INFO     | getspons.admin | Admin cache clear | entries_removed=1
+2026-05-21 18:44:53 | INFO     | getspons.main | ← POST /api/admin/cache/clear | status=200 | 11.4ms
+2026-05-21 18:44:53 | INFO     | getspons.main | → GET /api/brands | ip=127.0.0.1
+2026-05-21 18:44:53 | INFO     | getspons.main | ← GET /api/brands | status=307 | 1.3ms
+2026-05-21 18:44:53 | INFO     | getspons.main | → GET /api/brands/ | ip=127.0.0.1
+2026-05-21 18:44:53 | DEBUG    | getspons.cache | Cache MISS | key=brands_list_None_None
+2026-05-21 18:44:53 | INFO     | getspons.brands | Brands list fetched | filters=[none]
+2026-05-21 18:44:54 | DEBUG    | getspons.cache | Cache SET | key=brands_list_None_None | ttl=600s
+2026-05-21 18:44:54 | INFO     | getspons.main | ← GET /api/brands/ | status=200 | 141.0ms
