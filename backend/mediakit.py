@@ -1,21 +1,24 @@
 """
-mediakit.py — Media kit generation router for GetSpons.
+mediakit.py — Media kit generation and management router for GetSpons.
 
 Exposes:
-    POST /mediakit/generate
-        Validates the caller's JWT, fetches their creator profile from
-        Supabase, runs AI content generation, and returns the result as JSON.
-
-    POST /mediakit/pdf
-        Same auth + data flow as /generate, but returns the media kit
-        rendered as a downloadable PDF file.
+    POST  /mediakit/generate   Generate AI content AND upsert to mediakits table.
+    GET   /mediakit/saved      Fetch the saved mediakit for the logged-in user.
+    PATCH /mediakit/update     Partially update saved mediakit fields.
+    POST  /mediakit/pdf        Generate and return the mediakit as a PDF.
 """
+
+from __future__ import annotations
+
+from datetime import datetime, timezone
+from typing import Any, List, Optional
 
 from fastapi import APIRouter, Header, HTTPException
 from fastapi.responses import Response
+from pydantic import BaseModel
 
-from database import supabase, supabase_admin
 from ai import generate_mediakit_content
+from database import supabase, supabase_admin
 from pdf import generate_pdf
 
 router = APIRouter()
@@ -27,13 +30,7 @@ router = APIRouter()
 
 
 def _resolve_user_id(authorization: str) -> str:
-    """Validate the Bearer token and return the Supabase user_id.
-
-    Raises
-    ------
-    HTTPException 401
-        If the token is missing, malformed, or rejected.
-    """
+    """Validate Bearer token and return Supabase user_id."""
     try:
         token: str = authorization.replace("Bearer ", "").strip()
         if not token:
@@ -48,13 +45,7 @@ def _resolve_user_id(authorization: str) -> str:
 
 
 def _fetch_profile(user_id: str) -> dict:
-    """Fetch the creator profile row for *user_id*.
-
-    Raises
-    ------
-    HTTPException 404
-        If no profile row is found or the row is empty.
-    """
+    """Fetch creator profile row for user_id."""
     try:
         result = (
             supabase_admin
@@ -66,12 +57,15 @@ def _fetch_profile(user_id: str) -> dict:
         )
         profile: dict = result.data
     except Exception as exc:
+        msg = str(exc).lower()
+        if "no rows" in msg or "json object requested" in msg:
+            raise HTTPException(
+                status_code=404,
+                detail="No profile found. Please complete your creator profile first.",
+            ) from exc
         raise HTTPException(
-            status_code=404,
-            detail=(
-                "No profile found for this user. "
-                "Please complete your creator profile first."
-            ),
+            status_code=500,
+            detail=f"Failed to fetch profile: {exc}",
         ) from exc
 
     if not profile:
@@ -79,51 +73,62 @@ def _fetch_profile(user_id: str) -> dict:
             status_code=404,
             detail="Profile data is empty. Please complete your creator profile first.",
         )
-
     return profile
 
 
+def _no_rows(exc: Exception) -> bool:
+    """Return True when a Supabase .single() exception means no rows found."""
+    msg = str(exc).lower()
+    return "no rows" in msg or "json object requested" in msg
+
+
 # ---------------------------------------------------------------------------
-# POST /mediakit/generate  — returns JSON
+# Request model for PATCH /mediakit/update
+# ---------------------------------------------------------------------------
+
+
+class MediakitUpdateInput(BaseModel):
+    headline:             Optional[str]       = None
+    bio_short:            Optional[str]       = None
+    audience_description: Optional[str]       = None
+    content_style:        Optional[str]       = None
+    why_partner:          Optional[str]       = None
+    cta:                  Optional[str]       = None
+    key_stats:            Optional[List[Any]] = None
+    pricing_table:        Optional[List[Any]] = None
+
+
+# ---------------------------------------------------------------------------
+# POST /mediakit/generate
 # ---------------------------------------------------------------------------
 
 
 @router.post("/generate")
 def generate_mediakit(authorization: str = Header(...)):
-    """Generate an AI-written media kit for the authenticated creator.
+    """Generate AI media-kit content and upsert it to the mediakits table.
 
     Flow
     ----
-    1. Extract the Bearer token from the ``Authorization`` header.
-    2. Validate the token with Supabase Auth to obtain the ``user_id``.
-    3. Fetch the creator's profile row from the ``profiles`` table.
-    4. Pass the profile dict to ``generate_mediakit_content``.
-    5. Return the generated media-kit JSON to the caller.
-
-    Parameters
-    ----------
-    authorization:
-        HTTP ``Authorization`` header in the format ``Bearer <jwt>``.
+    1. Validate JWT → user_id.
+    2. Fetch creator profile.
+    3. Run AI content generation.
+    4. Upsert into mediakits (on_conflict = user_id).
+    5. Return the generated JSON.
 
     Returns
     -------
     dict
-        Generated media-kit content with keys: ``headline``, ``bio_short``,
-        ``key_stats``, ``audience_description``, ``content_style``,
-        ``why_partner``, ``pricing_table``, ``cta``.
+        Keys: headline, bio_short, key_stats, audience_description,
+        content_style, why_partner, pricing_table, cta.
 
     Raises
     ------
-    HTTPException 401
-        If the token is missing, malformed, or rejected by Supabase Auth.
-    HTTPException 404
-        If no profile row exists for the authenticated user.
-    HTTPException 500
-        If AI generation fails for any unexpected reason.
+    HTTPException 401 / 404 / 500
     """
     user_id = _resolve_user_id(authorization)
     profile = _fetch_profile(user_id)
 
+    # ── Generate ─────────────────────────────────────────────────────
     try:
         mediakit: dict = generate_mediakit_content(profile)
     except Exception as exc:
@@ -132,11 +137,179 @@ def generate_mediakit(authorization: str = Header(...)):
             detail=f"Media kit generation failed: {exc}",
         ) from exc
 
+    # ── Upsert ───────────────────────────────────────────────────────
+    try:
+        now = datetime.now(timezone.utc).isoformat()
+        supabase_admin.table("mediakits").upsert(
+            {
+                "user_id":              user_id,
+                "headline":             mediakit["headline"],
+                "bio_short":            mediakit["bio_short"],
+                "key_stats":            mediakit["key_stats"],
+                "audience_description": mediakit["audience_description"],
+                "content_style":        mediakit["content_style"],
+                "why_partner":          mediakit["why_partner"],
+                "pricing_table":        mediakit["pricing_table"],
+                "cta":                  mediakit["cta"],
+                "updated_at":           now,
+            },
+            on_conflict="user_id",
+        ).execute()
+    except Exception as exc:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to save media kit: {exc}",
+        ) from exc
+
     return mediakit
 
 
 # ---------------------------------------------------------------------------
-# POST /mediakit/pdf  — returns a downloadable PDF
+# GET /mediakit/saved
+# ---------------------------------------------------------------------------
+
+
+@router.get("/saved")
+def get_saved_mediakit(authorization: str = Header(...)):
+    """Fetch the saved media kit for the authenticated user.
+
+    Returns
+    -------
+    dict
+        The full mediakits row.
+
+    Raises
+    ------
+    HTTPException 401 / 404 / 500
+    """
+    user_id = _resolve_user_id(authorization)
+
+    try:
+        result = (
+            supabase_admin
+            .table("mediakits")
+            .select("*")
+            .eq("user_id", user_id)
+            .single()
+            .execute()
+        )
+        data = result.data
+    except Exception as exc:
+        if _no_rows(exc):
+            raise HTTPException(
+                status_code=404,
+                detail="No saved media kit found. Generate one first.",
+            ) from exc
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to fetch media kit: {exc}",
+        ) from exc
+
+    if not data:
+        raise HTTPException(
+            status_code=404,
+            detail="No saved media kit found. Generate one first.",
+        )
+
+    return data
+
+
+# ---------------------------------------------------------------------------
+# PATCH /mediakit/update
+# ---------------------------------------------------------------------------
+
+
+@router.patch("/update")
+def update_mediakit(
+    data: MediakitUpdateInput,
+    authorization: str = Header(...),
+):
+    """Partially update the saved media kit for the authenticated user.
+
+    Only fields explicitly provided in the request body are written.
+    ``updated_at`` is always refreshed automatically.
+
+    Parameters
+    ----------
+    data:
+        Any subset of: headline, bio_short, audience_description,
+        content_style, why_partner, cta, key_stats, pricing_table.
+
+    Returns
+    -------
+    dict
+        The full updated mediakits row.
+
+    Raises
+    ------
+    HTTPException 400   No fields provided.
+    HTTPException 401   Bad token.
+    HTTPException 404   No saved media kit to update.
+    HTTPException 500   Database error.
+    """
+    user_id = _resolve_user_id(authorization)
+
+    # Build payload from only the fields that were actually provided
+    updates: dict[str, Any] = {
+        k: v
+        for k, v in data.model_dump().items()
+        if v is not None
+    }
+
+    if not updates:
+        raise HTTPException(
+            status_code=400,
+            detail="No fields provided to update.",
+        )
+
+    updates["updated_at"] = datetime.now(timezone.utc).isoformat()
+
+    # Verify a saved mediakit exists before attempting update
+    try:
+        existing = (
+            supabase_admin
+            .table("mediakits")
+            .select("id")
+            .eq("user_id", user_id)
+            .single()
+            .execute()
+        )
+    except Exception as exc:
+        if _no_rows(exc):
+            raise HTTPException(
+                status_code=404,
+                detail="No saved media kit found. Generate one first.",
+            ) from exc
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to verify media kit: {exc}",
+        ) from exc
+
+    if not existing.data:
+        raise HTTPException(
+            status_code=404,
+            detail="No saved media kit found. Generate one first.",
+        )
+
+    # Apply update
+    try:
+        result = (
+            supabase_admin
+            .table("mediakits")
+            .update(updates)
+            .eq("user_id", user_id)
+            .execute()
+        )
+        return result.data[0]
+    except Exception as exc:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to update media kit: {exc}",
+        ) from exc
+
+
+# ---------------------------------------------------------------------------
+# POST /mediakit/pdf
 # ---------------------------------------------------------------------------
 
 
@@ -144,62 +317,60 @@ def generate_mediakit(authorization: str = Header(...)):
 def generate_mediakit_pdf(authorization: str = Header(...)):
     """Generate and return the media kit as a downloadable PDF.
 
-    Flow
-    ----
-    1. Validate the Bearer token → ``user_id``.
-    2. Fetch the creator's profile from Supabase.
-    3. Run AI content generation (same logic as ``/generate``).
-    4. Merge profile fields with AI content into a single template dict.
-    5. Render ``templates/mediakit.html`` and convert to PDF bytes.
-    6. Return the PDF with ``Content-Disposition: attachment``.
-
-    Parameters
-    ----------
-    authorization:
-        HTTP ``Authorization`` header in the format ``Bearer <jwt>``.
+    Prefers saved mediakit content; falls back to fresh generation if none
+    exists yet. Profile fields (name, platform, handle) are always pulled
+    from the profiles table.
 
     Returns
     -------
-    fastapi.responses.Response
-        ``application/pdf`` response with the filename
-        ``<creator_name>_media_kit.pdf``.
+    Response
+        application/pdf with Content-Disposition: attachment.
 
     Raises
     ------
-    HTTPException 401
-        If the token is missing, malformed, or rejected.
-    HTTPException 404
-        If no profile exists for the user.
-    HTTPException 500
-        If AI generation or PDF rendering fails.
+    HTTPException 401 / 404 / 500
     """
-    # ── Step 1: auth ────────────────────────────────────────────────
     user_id = _resolve_user_id(authorization)
-
-    # ── Step 2: profile ─────────────────────────────────────────────
     profile = _fetch_profile(user_id)
 
-    # ── Step 3: AI content generation ───────────────────────────────
+    # Prefer saved content, fall back to fresh generation
+    mediakit: dict = {}
     try:
-        mediakit: dict = generate_mediakit_content(profile)
-    except Exception as exc:
-        raise HTTPException(
-            status_code=500,
-            detail=f"Media kit generation failed: {exc}",
-        ) from exc
+        saved_res = (
+            supabase_admin
+            .table("mediakits")
+            .select("*")
+            .eq("user_id", user_id)
+            .single()
+            .execute()
+        )
+        mediakit = saved_res.data or {}
+    except Exception:
+        pass
 
-    # ── Step 4: build template context ──────────────────────────────
-    # Pull the fields the template needs from profile, with safe fallbacks.
+    if not mediakit:
+        try:
+            mediakit = generate_mediakit_content(profile)
+        except Exception as exc:
+            raise HTTPException(
+                status_code=500,
+                detail=f"Media kit generation failed: {exc}",
+            ) from exc
+
     template_data: dict = {
-        # Profile-sourced fields
-        "creator_name":  profile.get("full_name") or profile.get("name", "Creator"),
-        "platform":      profile.get("platform", ""),
-        "handle":        profile.get("handle", ""),
-        # AI-generated fields (all present if generate_mediakit_content succeeded)
-        **mediakit,
+        "creator_name": profile.get("full_name") or profile.get("name", "Creator"),
+        "platform":     profile.get("platform", ""),
+        "handle":       profile.get("handle", ""),
+        **{
+            k: mediakit.get(k, "")
+            for k in (
+                "headline", "bio_short", "key_stats",
+                "audience_description", "content_style",
+                "why_partner", "pricing_table", "cta",
+            )
+        },
     }
 
-    # ── Step 5: render to PDF ────────────────────────────────────────
     try:
         pdf_bytes: bytes = generate_pdf(template_data)
     except Exception as exc:
@@ -208,7 +379,6 @@ def generate_mediakit_pdf(authorization: str = Header(...)):
             detail=f"PDF rendering failed: {exc}",
         ) from exc
 
-    # ── Step 6: stream back as downloadable file ─────────────────────
     safe_name = template_data["creator_name"].replace(" ", "_")
     filename = f"{safe_name}_media_kit.pdf"
 
