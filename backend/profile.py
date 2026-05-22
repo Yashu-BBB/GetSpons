@@ -40,17 +40,19 @@ PRESET_NICHES = {
 
 
 class ProfileInput(BaseModel):
-    full_name:       str
-    platform:        str
-    handle:          str
-    followers:       int
-    niche:           str
-    engagement_rate: float
-    bio:             str
-    past_sponsors:   Optional[List[str]] = []
-    pricing_min:     int
-    pricing_max:     int
+    full_name:        str
+    platform:         str
+    handle:           str
+    followers:        int
+    niche:            str
+    secondary_niches: Optional[List[str]] = []
+    engagement_rate:  float
+    bio:              str
+    past_sponsors:    Optional[List[str]] = []
+    pricing_min:      int
+    pricing_max:      int
 
+    # ── handle cannot be empty ──────────────────────────────────────
     @field_validator("handle")
     @classmethod
     def handle_not_empty(cls, v: str) -> str:
@@ -59,6 +61,7 @@ class ProfileInput(BaseModel):
             raise ValueError("Handle cannot be empty.")
         return v
 
+    # ── followers must be > 0 ───────────────────────────────────────
     @field_validator("followers")
     @classmethod
     def followers_positive(cls, v: int) -> int:
@@ -66,6 +69,7 @@ class ProfileInput(BaseModel):
             raise ValueError("Followers must be greater than 0.")
         return v
 
+    # ── engagement_rate must be between 0 and 100 ───────────────────
     @field_validator("engagement_rate")
     @classmethod
     def engagement_in_range(cls, v: float) -> float:
@@ -73,6 +77,7 @@ class ProfileInput(BaseModel):
             raise ValueError("Engagement rate must be between 0 and 100.")
         return v
 
+    # ── niche: preset list OR any non-empty custom value ────────────
     @field_validator("niche")
     @classmethod
     def niche_valid(cls, v: str) -> str:
@@ -84,8 +89,38 @@ class ProfileInput(BaseModel):
             )
         return v
 
+    # ── secondary_niches: max 3, preset only, no overlap ────────────
+    @field_validator("secondary_niches")
+    @classmethod
+    def secondary_niches_valid(cls, v: Optional[List[str]]) -> List[str]:
+        if not v:
+            return []
+
+        # Max 3 items
+        if len(v) > 3:
+            raise ValueError(
+                f"secondary_niches can contain at most 3 items. Got {len(v)}."
+            )
+
+        # Each item must be from the preset list
+        invalid = [n for n in v if n not in PRESET_NICHES]
+        if invalid:
+            raise ValueError(
+                f"Invalid secondary niche(s): {invalid}. "
+                f"Must be one of: {sorted(PRESET_NICHES)}."
+            )
+
+        # No duplicate values within the list itself
+        if len(v) != len(set(v)):
+            raise ValueError("secondary_niches cannot contain duplicate values.")
+
+        return v
+
+    # ── pricing_min must be < pricing_max ───────────────────────────
+    # ── secondary_niches cannot overlap with primary niche ──────────
     @model_validator(mode="after")
-    def pricing_range_valid(self) -> "ProfileInput":
+    def cross_field_checks(self) -> "ProfileInput":
+        # Pricing range
         if self.pricing_min is not None and self.pricing_max is not None:
             if self.pricing_min <= 0:
                 raise ValueError("Minimum pricing must be greater than 0.")
@@ -96,6 +131,15 @@ class ProfileInput(BaseModel):
                     "pricing_min must be strictly less than pricing_max. "
                     f"Got min={self.pricing_min}, max={self.pricing_max}."
                 )
+
+        # Secondary niches must not include the primary niche
+        if self.secondary_niches and self.niche:
+            if self.niche in self.secondary_niches:
+                raise ValueError(
+                    f"secondary_niches cannot contain the same value as "
+                    f"the primary niche ('{self.niche}')."
+                )
+
         return self
 
 
@@ -155,7 +199,10 @@ def save_profile(data: ProfileInput, authorization: str = Header(...)):
 
 @router.get("/me")
 def get_profile(authorization: str = Header(...)):
-    """Fetch the authenticated creator's profile. Cached for 300 seconds."""
+    """Fetch the authenticated creator's profile. Cached for 300 seconds.
+
+    Returns all profile fields including secondary_niches.
+    """
     # ── Auth ─────────────────────────────────────────────────────────
     try:
         token = authorization.replace("Bearer ", "").strip()

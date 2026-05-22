@@ -54,6 +54,7 @@ if not _root.handlers:                 # guard against double-registration
         backupCount=7,         # keep 7 rotated files
         encoding="utf-8",
         utc=False,
+        delay=True
     )
     _file.setLevel(logging.DEBUG)      # write DEBUG+ to file
     _file.setFormatter(_formatter)

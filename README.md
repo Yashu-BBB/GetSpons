@@ -9,7 +9,10 @@ AI-powered sponsorship platform for creators.
 -Vercle
 
 ## Features
--AI Media Kit Generator
--Brand Match Engine
--AI Pitch Writer
--Outreach Tracker
+-AI Media Kit Generator (Completed)
+-Brand Match Engine  
+-AI Pitch Writer  (completed)
+-Outreach Tracker  (completed)
+-Live account Tracking  
+-Verified Badge
+-Capable of Connecting Multi-SocialMedia Accounts
