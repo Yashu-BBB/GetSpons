@@ -31,6 +31,8 @@ from mediakit import router as mediakit_router
 from pitch import router as pitch_router
 from profile import router as profile_router
 from admin import router as admin_router
+from brand_profile import router as brand_profile_router
+from match import router as match_router
 
 load_dotenv()
 
@@ -178,6 +180,8 @@ app.include_router(brands_router,   prefix="/api/brands")
 app.include_router(pitch_router,    prefix="/api/pitches")
 app.include_router(admin_router,    prefix="/api/admin")
 app.include_router(brand_auth_router, prefix="/api/brand-auth")
+app.include_router(brand_profile_router, prefix="/api/brand-profile")
+app.include_router(match_router,         prefix="/api/match")
 
 # ---------------------------------------------------------------------------
 # Health check

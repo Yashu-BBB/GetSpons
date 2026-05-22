@@ -36,3 +36,74 @@
 2026-05-22 16:55:00 | INFO     | getspons.brand_auth | Brand login attempt | email=test@brandcompany.com
 2026-05-22 16:55:00 | INFO     | getspons.brand_auth | Brand login successful | email=test@brandcompany.com | brand_user_id=82d1e324-36e9-46f2-817d-0edcb8227d48
 2026-05-22 16:55:00 | INFO     | getspons.main | ← POST /api/brand-auth/login | status=200 | 327.5ms
+2026-05-22 17:07:06 | INFO     | getspons.main | → POST /api/brand-auth/login | ip=127.0.0.1
+2026-05-22 17:07:06 | INFO     | getspons.brand_auth | Brand login attempt | email=test@brandcompany.com
+2026-05-22 17:07:08 | INFO     | getspons.main | ← POST /api/brand-auth/login | status=500 | 1920.5ms
+2026-05-22 17:08:28 | INFO     | getspons.main | → POST /api/brand-auth/login | ip=127.0.0.1
+2026-05-22 17:08:28 | INFO     | getspons.brand_auth | Brand login attempt | email=test@brandcompany.com
+2026-05-22 17:08:31 | WARNING  | getspons.main | ← POST /api/brand-auth/login | status=500 | 2136.5ms  ⚠ SLOW REQUEST
+2026-05-22 17:11:09 | INFO     | getspons.main | → POST /api/brand-auth/register | ip=127.0.0.1
+2026-05-22 17:11:09 | INFO     | getspons.brand_auth | Brand register attempt | email=test@brandcompany.com | company=Test Brand Co
+2026-05-22 17:11:10 | WARNING  | getspons.brand_auth | Brand register failed (auth step) | email=test@brandcompany.com | reason=User already registered
+2026-05-22 17:11:10 | INFO     | getspons.main | ← POST /api/brand-auth/register | status=400 | 800.5ms
+2026-05-22 17:12:14 | INFO     | getspons.main | → POST /api/brand-auth/register | ip=127.0.0.1
+2026-05-22 17:12:14 | INFO     | getspons.brand_auth | Brand register attempt | email=test@brandcompany.com | company=Test Brand Co
+2026-05-22 17:12:15 | INFO     | getspons.brand_auth | Brand Supabase auth user created | auth_user_id=957e653c-d86e-4854-a218-83e98ffcef91
+2026-05-22 17:12:16 | INFO     | getspons.brand_auth | Brand register successful | email=test@brandcompany.com | brand_user_id=13c1301b-3b7d-48ac-a40e-2f546f502950
+2026-05-22 17:12:16 | INFO     | getspons.main | ← POST /api/brand-auth/register | status=200 | 1936.6ms
+2026-05-22 17:12:48 | INFO     | getspons.main | → POST /api/brand-auth/login | ip=127.0.0.1
+2026-05-22 17:12:48 | INFO     | getspons.brand_auth | Brand login attempt | email=test@brandcompany.com
+2026-05-22 17:12:49 | INFO     | getspons.brand_auth | Brand login successful | email=test@brandcompany.com | brand_user_id=13c1301b-3b7d-48ac-a40e-2f546f502950
+2026-05-22 17:12:49 | INFO     | getspons.main | ← POST /api/brand-auth/login | status=200 | 702.9ms
+2026-05-22 17:14:11 | INFO     | getspons.main | → POST /api/brand-auth/login | ip=127.0.0.1
+2026-05-22 17:14:12 | INFO     | getspons.brand_auth | Brand login attempt | email=test@brandcompany.com
+2026-05-22 17:14:14 | INFO     | getspons.brand_auth | Brand login successful | email=test@brandcompany.com | brand_user_id=13c1301b-3b7d-48ac-a40e-2f546f502950
+2026-05-22 17:14:14 | WARNING  | getspons.main | ← POST /api/brand-auth/login | status=200 | 2297.9ms  ⚠ SLOW REQUEST
+2026-05-22 17:14:26 | INFO     | getspons.main | → POST /api/brand-auth/login | ip=127.0.0.1
+2026-05-22 17:14:26 | INFO     | getspons.brand_auth | Brand login attempt | email=test@brandcompany.com
+2026-05-22 17:14:27 | INFO     | getspons.brand_auth | Brand login successful | email=test@brandcompany.com | brand_user_id=13c1301b-3b7d-48ac-a40e-2f546f502950
+2026-05-22 17:14:27 | INFO     | getspons.main | ← POST /api/brand-auth/login | status=200 | 1558.0ms
+2026-05-22 17:15:33 | INFO     | getspons.main | → POST /api/brand-auth/login | ip=127.0.0.1
+2026-05-22 17:15:33 | INFO     | getspons.brand_auth | Brand login attempt | email=test@brandcompany.com
+2026-05-22 17:15:35 | INFO     | getspons.brand_auth | Brand login successful | email=test@brandcompany.com | brand_user_id=13c1301b-3b7d-48ac-a40e-2f546f502950
+2026-05-22 17:15:35 | WARNING  | getspons.main | ← POST /api/brand-auth/login | status=200 | 2170.1ms  ⚠ SLOW REQUEST
+2026-05-22 17:17:05 | INFO     | getspons.main | → POST /api/brand-auth/login | ip=127.0.0.1
+2026-05-22 17:17:06 | INFO     | getspons.brand_auth | Brand login attempt | email=test@brandcompany.com
+2026-05-22 17:17:08 | INFO     | getspons.brand_auth | Brand login successful | email=test@brandcompany.com | brand_user_id=13c1301b-3b7d-48ac-a40e-2f546f502950
+2026-05-22 17:17:08 | WARNING  | getspons.main | ← POST /api/brand-auth/login | status=200 | 2424.9ms  ⚠ SLOW REQUEST
+2026-05-22 17:17:08 | INFO     | getspons.main | → POST /api/brand-profile/save | ip=127.0.0.1
+2026-05-22 17:17:08 | INFO     | getspons.brand_profile | Brand profile save attempt | brand_user_id=13c1301b-3b7d-48ac-a40e-2f546f502950
+2026-05-22 17:17:08 | ERROR    | getspons.brand_profile | Brand profile save failed | brand_user_id=13c1301b-3b7d-48ac-a40e-2f546f502950 | reason={'message': "Could not find the 'updated_at' column of 'brand_profiles' in the schema cache", 'code': 'PGRST204', 'hint': None, 'details': None}
+2026-05-22 17:17:08 | INFO     | getspons.main | ← POST /api/brand-profile/save | status=500 | 388.2ms
+2026-05-22 17:18:38 | INFO     | getspons.main | → POST /api/brand-auth/login | ip=127.0.0.1
+2026-05-22 17:18:38 | INFO     | getspons.brand_auth | Brand login attempt | email=test@brandcompany.com
+2026-05-22 17:18:39 | INFO     | getspons.brand_auth | Brand login successful | email=test@brandcompany.com | brand_user_id=13c1301b-3b7d-48ac-a40e-2f546f502950
+2026-05-22 17:18:39 | INFO     | getspons.main | ← POST /api/brand-auth/login | status=200 | 933.9ms
+2026-05-22 17:18:39 | INFO     | getspons.main | → POST /api/brand-profile/save | ip=127.0.0.1
+2026-05-22 17:18:39 | INFO     | getspons.brand_profile | Brand profile save attempt | brand_user_id=13c1301b-3b7d-48ac-a40e-2f546f502950
+2026-05-22 17:18:39 | INFO     | getspons.brand_profile | Brand profile saved successfully | brand_user_id=13c1301b-3b7d-48ac-a40e-2f546f502950
+2026-05-22 17:18:39 | INFO     | getspons.main | ← POST /api/brand-profile/save | status=200 | 331.6ms
+2026-05-22 17:19:50 | INFO     | getspons.main | → POST /api/brand-auth/login | ip=127.0.0.1
+2026-05-22 17:19:50 | INFO     | getspons.brand_auth | Brand login attempt | email=test@brandcompany.com
+2026-05-22 17:19:52 | INFO     | getspons.brand_auth | Brand login successful | email=test@brandcompany.com | brand_user_id=13c1301b-3b7d-48ac-a40e-2f546f502950
+2026-05-22 17:19:52 | INFO     | getspons.main | ← POST /api/brand-auth/login | status=200 | 1920.6ms
+2026-05-22 17:19:52 | INFO     | getspons.main | → GET /api/match/creators | ip=127.0.0.1
+2026-05-22 17:19:52 | DEBUG    | getspons.cache | Cache MISS | key=match_13c1301b-3b7d-48ac-a40e-2f546f502950
+2026-05-22 17:19:52 | INFO     | getspons.match | Match query started | brand_user_id=13c1301b-3b7d-48ac-a40e-2f546f502950 | niche=Finance | followers=10000-200000 | budget_max=10000
+2026-05-22 17:19:52 | INFO     | getspons.match | Primary matches found | brand_user_id=13c1301b-3b7d-48ac-a40e-2f546f502950 | count=1
+2026-05-22 17:19:53 | INFO     | getspons.match | Secondary matches found | brand_user_id=13c1301b-3b7d-48ac-a40e-2f546f502950 | count=0
+2026-05-22 17:19:53 | DEBUG    | getspons.cache | Cache SET | key=match_13c1301b-3b7d-48ac-a40e-2f546f502950 | ttl=300s
+2026-05-22 17:19:53 | INFO     | getspons.match | Match results cached | brand_user_id=13c1301b-3b7d-48ac-a40e-2f546f502950 | total=1
+2026-05-22 17:19:53 | INFO     | getspons.main | ← GET /api/match/creators | status=200 | 662.0ms
+2026-05-22 17:21:02 | INFO     | getspons.main | → POST /api/brand-auth/login | ip=127.0.0.1
+2026-05-22 17:21:02 | INFO     | getspons.brand_auth | Brand login attempt | email=test@brandcompany.com
+2026-05-22 17:21:05 | INFO     | getspons.brand_auth | Brand login successful | email=test@brandcompany.com | brand_user_id=13c1301b-3b7d-48ac-a40e-2f546f502950
+2026-05-22 17:21:05 | WARNING  | getspons.main | ← POST /api/brand-auth/login | status=200 | 2477.8ms  ⚠ SLOW REQUEST
+2026-05-22 17:21:05 | INFO     | getspons.main | → GET /api/match/creators | ip=127.0.0.1
+2026-05-22 17:21:05 | DEBUG    | getspons.cache | Cache MISS | key=match_13c1301b-3b7d-48ac-a40e-2f546f502950
+2026-05-22 17:21:05 | INFO     | getspons.match | Match query started | brand_user_id=13c1301b-3b7d-48ac-a40e-2f546f502950 | niche=Finance | followers=10000-200000 | budget_max=10000
+2026-05-22 17:21:06 | INFO     | getspons.match | Primary matches found | brand_user_id=13c1301b-3b7d-48ac-a40e-2f546f502950 | count=1
+2026-05-22 17:21:06 | INFO     | getspons.match | Secondary matches found | brand_user_id=13c1301b-3b7d-48ac-a40e-2f546f502950 | count=0
+2026-05-22 17:21:06 | DEBUG    | getspons.cache | Cache SET | key=match_13c1301b-3b7d-48ac-a40e-2f546f502950 | ttl=300s
+2026-05-22 17:21:06 | INFO     | getspons.match | Match results cached | brand_user_id=13c1301b-3b7d-48ac-a40e-2f546f502950 | total=1
+2026-05-22 17:21:06 | INFO     | getspons.main | ← GET /api/match/creators | status=200 | 611.1ms
