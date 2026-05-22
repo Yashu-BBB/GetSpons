@@ -14,3 +14,43 @@
 2026-05-22 17:30:54 | DEBUG    | getspons.cache | Cache HIT | key=match_13c1301b-3b7d-48ac-a40e-2f546f502950
 2026-05-22 17:30:54 | INFO     | getspons.match | Match results served from cache | brand_user_id=13c1301b-3b7d-48ac-a40e-2f546f502950
 2026-05-22 17:30:54 | INFO     | getspons.main | ← GET /api/match/creators | status=200 | 268.2ms
+2026-05-22 17:43:36 | INFO     | getspons.main | → GET /api/admin/stats | ip=127.0.0.1
+2026-05-22 17:43:36 | INFO     | getspons.admin | Admin: fetching platform stats
+2026-05-22 17:43:39 | INFO     | getspons.admin | Admin: stats fetched | {'total_creators': 2, 'total_brands': 1, 'total_pitches': 4, 'total_mediakits': 1, 'pro_users': 0}
+2026-05-22 17:43:39 | WARNING  | getspons.main | ← GET /api/admin/stats | status=200 | 2920.2ms  ⚠ SLOW REQUEST
+2026-05-22 17:43:39 | INFO     | getspons.main | → GET /api/admin/users | ip=127.0.0.1
+2026-05-22 17:43:39 | INFO     | getspons.admin | Admin: listing all creators
+2026-05-22 17:43:39 | INFO     | getspons.admin | Admin: creators listed | count=2
+2026-05-22 17:43:39 | INFO     | getspons.main | ← GET /api/admin/users | status=200 | 282.7ms
+2026-05-22 17:43:39 | INFO     | getspons.main | → GET /api/admin/brands | ip=127.0.0.1
+2026-05-22 17:43:39 | INFO     | getspons.admin | Admin: listing all brands
+2026-05-22 17:43:39 | INFO     | getspons.admin | Admin: brands listed | count=1
+2026-05-22 17:43:39 | INFO     | getspons.main | ← GET /api/admin/brands | status=200 | 272.3ms
+2026-05-22 17:45:45 | INFO     | getspons.main | → GET /api/admin/stats | ip=127.0.0.1
+2026-05-22 17:45:45 | INFO     | getspons.admin | Admin: fetching platform stats
+2026-05-22 17:45:47 | INFO     | getspons.admin | Admin: stats fetched | {'total_creators': 2, 'total_brands': 1, 'total_pitches': 4, 'total_mediakits': 1, 'pro_users': 0}
+2026-05-22 17:45:47 | WARNING  | getspons.main | ← GET /api/admin/stats | status=200 | 2483.9ms  ⚠ SLOW REQUEST
+2026-05-22 17:45:47 | INFO     | getspons.main | → GET /api/admin/users | ip=127.0.0.1
+2026-05-22 17:45:47 | INFO     | getspons.admin | Admin: listing all creators
+2026-05-22 17:45:48 | INFO     | getspons.admin | Admin: creators listed | count=2
+2026-05-22 17:45:48 | INFO     | getspons.main | ← GET /api/admin/users | status=200 | 270.3ms
+2026-05-22 17:45:48 | INFO     | getspons.main | → GET /api/admin/brands | ip=127.0.0.1
+2026-05-22 17:45:48 | INFO     | getspons.admin | Admin: listing all brands
+2026-05-22 17:45:48 | INFO     | getspons.admin | Admin: brands listed | count=1
+2026-05-22 17:45:48 | INFO     | getspons.main | ← GET /api/admin/brands | status=200 | 303.6ms
+2026-05-22 17:45:48 | INFO     | getspons.main | → GET /api/admin/users | ip=127.0.0.1
+2026-05-22 17:45:48 | INFO     | getspons.admin | Admin: listing all creators
+2026-05-22 17:45:48 | INFO     | getspons.admin | Admin: creators listed | count=2
+2026-05-22 17:45:48 | INFO     | getspons.main | ← GET /api/admin/users | status=200 | 226.3ms
+2026-05-22 17:45:48 | INFO     | getspons.main | → PATCH /api/admin/users/30e39d50-960d-4f2c-b7ec-a8ecdbeea896/plan | ip=127.0.0.1
+2026-05-22 17:45:48 | INFO     | getspons.admin | Admin: updating plan | user_id=30e39d50-960d-4f2c-b7ec-a8ecdbeea896 | plan=pro
+2026-05-22 17:45:48 | INFO     | getspons.admin | Admin: plan updated | user_id=30e39d50-960d-4f2c-b7ec-a8ecdbeea896 | plan=pro
+2026-05-22 17:45:48 | INFO     | getspons.main | ← PATCH /api/admin/users/30e39d50-960d-4f2c-b7ec-a8ecdbeea896/plan | status=200 | 186.4ms
+2026-05-22 17:45:48 | INFO     | getspons.main | → GET /api/admin/brands | ip=127.0.0.1
+2026-05-22 17:45:48 | INFO     | getspons.admin | Admin: listing all brands
+2026-05-22 17:45:49 | INFO     | getspons.admin | Admin: brands listed | count=1
+2026-05-22 17:45:49 | INFO     | getspons.main | ← GET /api/admin/brands | status=200 | 403.2ms
+2026-05-22 17:45:49 | INFO     | getspons.main | → PATCH /api/admin/brands/13c1301b-3b7d-48ac-a40e-2f546f502950/approve | ip=127.0.0.1
+2026-05-22 17:45:49 | INFO     | getspons.admin | Admin: brand approve/deactivate | brand_id=13c1301b-3b7d-48ac-a40e-2f546f502950 | active=True
+2026-05-22 17:45:49 | INFO     | getspons.admin | Admin: brand active updated | brand_id=13c1301b-3b7d-48ac-a40e-2f546f502950 | active=True
+2026-05-22 17:45:49 | INFO     | getspons.main | ← PATCH /api/admin/brands/13c1301b-3b7d-48ac-a40e-2f546f502950/approve | status=200 | 273.4ms
