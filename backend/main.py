@@ -16,7 +16,7 @@ router file. See comments below for exact limits per endpoint.
 
 import time
 from collections import defaultdict
-
+from brand_auth import router as brand_auth_router
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
@@ -177,7 +177,7 @@ app.include_router(mediakit_router, prefix="/api/mediakit")
 app.include_router(brands_router,   prefix="/api/brands")
 app.include_router(pitch_router,    prefix="/api/pitches")
 app.include_router(admin_router,    prefix="/api/admin")
-
+app.include_router(brand_auth_router, prefix="/api/brand-auth")
 
 # ---------------------------------------------------------------------------
 # Health check

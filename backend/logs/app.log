@@ -1,0 +1,38 @@
+2026-05-22 16:48:32 | INFO     | getspons.main | → POST /api/brand-auth/register | ip=127.0.0.1
+2026-05-22 16:48:32 | INFO     | getspons.brand_auth | Brand register attempt | email=test@brandcompany.com | company=Test Brand Co
+2026-05-22 16:48:36 | INFO     | getspons.brand_auth | Brand Supabase auth user created | auth_user_id=6d328538-4064-472a-aaad-45b19186dade
+2026-05-22 16:48:37 | ERROR    | getspons.brand_auth | Brand register failed (db insert) | auth_user_id=6d328538-4064-472a-aaad-45b19186dade | reason={'message': "Could not find the 'user_id' column of 'brand_users' in the schema cache", 'code': 'PGRST204', 'hint': None, 'details': None}
+2026-05-22 16:48:37 | INFO     | getspons.brand_auth | Orphaned auth user cleaned up | auth_user_id=6d328538-4064-472a-aaad-45b19186dade
+2026-05-22 16:48:37 | WARNING  | getspons.main | ← POST /api/brand-auth/register | status=500 | 5112.1ms  ⚠ SLOW REQUEST
+2026-05-22 16:48:37 | INFO     | getspons.main | → POST /api/brand-auth/login | ip=127.0.0.1
+2026-05-22 16:48:37 | INFO     | getspons.brand_auth | Brand login attempt | email=test@brandcompany.com
+2026-05-22 16:48:37 | WARNING  | getspons.brand_auth | Brand login failed (auth step) | email=test@brandcompany.com | reason=Invalid login credentials
+2026-05-22 16:48:37 | INFO     | getspons.main | ← POST /api/brand-auth/login | status=401 | 112.8ms
+2026-05-22 16:50:51 | INFO     | getspons.main | → POST /api/brand-auth/register | ip=127.0.0.1
+2026-05-22 16:50:51 | INFO     | getspons.brand_auth | Brand register attempt | email=test@brandcompany.com | company=Test Brand Co
+2026-05-22 16:50:54 | INFO     | getspons.brand_auth | Brand Supabase auth user created | auth_user_id=c757d196-12e3-4348-b374-b6feb8f5ee43
+2026-05-22 16:50:55 | INFO     | getspons.brand_auth | Brand register successful | email=test@brandcompany.com | brand_user_id=9391e7d8-fc2e-4fab-99ac-37ce8c62c0f5
+2026-05-22 16:50:55 | WARNING  | getspons.main | ← POST /api/brand-auth/register | status=200 | 3939.0ms  ⚠ SLOW REQUEST
+2026-05-22 16:50:55 | INFO     | getspons.main | → POST /api/brand-auth/login | ip=127.0.0.1
+2026-05-22 16:50:55 | INFO     | getspons.brand_auth | Brand login attempt | email=test@brandcompany.com
+2026-05-22 16:50:55 | WARNING  | getspons.brand_auth | Brand login failed (auth step) | email=test@brandcompany.com | reason=Email not confirmed
+2026-05-22 16:50:55 | INFO     | getspons.main | ← POST /api/brand-auth/login | status=401 | 172.3ms
+2026-05-22 16:52:05 | INFO     | getspons.main | → POST /api/brand-auth/register | ip=127.0.0.1
+2026-05-22 16:52:05 | INFO     | getspons.brand_auth | Brand register attempt | email=test@brandcompany.com | company=Test Brand Co
+2026-05-22 16:52:06 | INFO     | getspons.brand_auth | Brand Supabase auth user created | auth_user_id=c757d196-12e3-4348-b374-b6feb8f5ee43
+2026-05-22 16:52:06 | ERROR    | getspons.brand_auth | Brand register failed (db insert) | auth_user_id=c757d196-12e3-4348-b374-b6feb8f5ee43 | reason={'message': 'duplicate key value violates unique constraint "brand_users_email_key"', 'code': '23505', 'hint': None, 'details': 'Key (email)=(test@brandcompany.com) already exists.'}
+2026-05-22 16:52:06 | INFO     | getspons.brand_auth | Orphaned auth user cleaned up | auth_user_id=c757d196-12e3-4348-b374-b6feb8f5ee43
+2026-05-22 16:52:06 | INFO     | getspons.main | ← POST /api/brand-auth/register | status=500 | 1156.3ms
+2026-05-22 16:52:06 | INFO     | getspons.main | → POST /api/brand-auth/login | ip=127.0.0.1
+2026-05-22 16:52:07 | INFO     | getspons.brand_auth | Brand login attempt | email=test@brandcompany.com
+2026-05-22 16:52:07 | WARNING  | getspons.brand_auth | Brand login failed (auth step) | email=test@brandcompany.com | reason=Invalid login credentials
+2026-05-22 16:52:07 | INFO     | getspons.main | ← POST /api/brand-auth/login | status=401 | 93.8ms
+2026-05-22 16:54:58 | INFO     | getspons.main | → POST /api/brand-auth/register | ip=127.0.0.1
+2026-05-22 16:54:58 | INFO     | getspons.brand_auth | Brand register attempt | email=test@brandcompany.com | company=Test Brand Co
+2026-05-22 16:54:59 | INFO     | getspons.brand_auth | Brand Supabase auth user created | auth_user_id=4b076654-7241-4f25-bad4-f1ad4021c5c2
+2026-05-22 16:55:00 | INFO     | getspons.brand_auth | Brand register successful | email=test@brandcompany.com | brand_user_id=82d1e324-36e9-46f2-817d-0edcb8227d48
+2026-05-22 16:55:00 | INFO     | getspons.main | ← POST /api/brand-auth/register | status=200 | 1617.4ms
+2026-05-22 16:55:00 | INFO     | getspons.main | → POST /api/brand-auth/login | ip=127.0.0.1
+2026-05-22 16:55:00 | INFO     | getspons.brand_auth | Brand login attempt | email=test@brandcompany.com
+2026-05-22 16:55:00 | INFO     | getspons.brand_auth | Brand login successful | email=test@brandcompany.com | brand_user_id=82d1e324-36e9-46f2-817d-0edcb8227d48
+2026-05-22 16:55:00 | INFO     | getspons.main | ← POST /api/brand-auth/login | status=200 | 327.5ms
