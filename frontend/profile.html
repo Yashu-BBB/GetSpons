@@ -37,6 +37,23 @@
       margin: 24px 0 14px;
     }
 
+    /* Field-level error messages */
+    .field-error {
+      font-size: 0.76rem;
+      color: var(--red);
+      margin-top: 4px;
+      display: none;
+    }
+    .field-error.show { display: block; }
+    .form-input.invalid,
+    .form-select.invalid {
+      border-color: var(--red);
+      box-shadow: 0 0 0 3px #FEE2E2;
+    }
+
+    /* "Other" niche text input (hidden by default) */
+    #nicheOtherWrapper { display: none; margin-top: 8px; }
+
     /* Sponsors tag input */
     .tags-wrapper {
       display: flex;
@@ -93,13 +110,14 @@
 
     <div class="alert" id="alertBox"></div>
 
-    <form id="profileForm">
+    <form id="profileForm" novalidate>
 
       <div class="form-section-title">Basic Info</div>
       <div class="form-grid-2">
         <div class="form-group">
           <label class="form-label" for="full_name">Full Name</label>
           <input class="form-input" type="text" id="full_name" placeholder="Ananya Kulkarni" required />
+          <span class="field-error" id="err_full_name">Full name is required.</span>
         </div>
         <div class="form-group">
           <label class="form-label" for="platform">Platform</label>
@@ -111,6 +129,7 @@
             <option value="LinkedIn">LinkedIn</option>
             <option value="TikTok">TikTok</option>
           </select>
+          <span class="field-error" id="err_platform">Please select a platform.</span>
         </div>
       </div>
 
@@ -118,22 +137,29 @@
         <div class="form-group">
           <label class="form-label" for="handle">Handle / Username</label>
           <input class="form-input" type="text" id="handle" placeholder="@ananya.creates" required />
+          <span class="field-error" id="err_handle">Handle cannot be empty.</span>
         </div>
         <div class="form-group">
           <label class="form-label" for="niche">Content Niche</label>
           <select class="form-select" id="niche" required>
             <option value="">Select niche</option>
-            <option>Beauty & Skincare</option>
-            <option>Tech & Gadgets</option>
-            <option>Food & Cooking</option>
-            <option>Fitness & Health</option>
-            <option>Finance & Investing</option>
-            <option>Travel & Lifestyle</option>
-            <option>Gaming</option>
-            <option>Fashion</option>
-            <option>Parenting</option>
-            <option>Education</option>
+            <option value="Finance">Finance</option>
+            <option value="Fitness">Fitness</option>
+            <option value="Beauty">Beauty</option>
+            <option value="Tech">Tech</option>
+            <option value="Food">Food</option>
+            <option value="Travel">Travel</option>
+            <option value="Gaming">Gaming</option>
+            <option value="Fashion">Fashion</option>
+            <option value="Education">Education</option>
+            <option value="Entertainment">Entertainment</option>
+            <option value="Other">Other…</option>
           </select>
+          <!-- Shown when "Other" is selected -->
+          <div id="nicheOtherWrapper">
+            <input class="form-input" type="text" id="nicheOther" placeholder="Describe your niche" />
+          </div>
+          <span class="field-error" id="err_niche">Please select or specify your niche.</span>
         </div>
       </div>
 
@@ -141,12 +167,14 @@
       <div class="form-grid-2">
         <div class="form-group">
           <label class="form-label" for="followers">Followers / Subscribers</label>
-          <input class="form-input" type="number" id="followers" placeholder="42000" min="0" required />
+          <input class="form-input" type="number" id="followers" placeholder="42000" min="1" required />
+          <span class="field-error" id="err_followers">Followers must be a positive number.</span>
         </div>
         <div class="form-group">
           <label class="form-label" for="engagement_rate">Engagement Rate (%)</label>
           <input class="form-input" type="number" id="engagement_rate" placeholder="6.5" min="0" max="100" step="0.1" required />
           <span class="form-hint">Avg. likes+comments ÷ followers × 100</span>
+          <span class="field-error" id="err_engagement_rate">Engagement rate must be between 0 and 100.</span>
         </div>
       </div>
 
@@ -155,10 +183,12 @@
         <div class="form-group">
           <label class="form-label" for="pricing_min">Min. Rate (₹)</label>
           <input class="form-input" type="number" id="pricing_min" placeholder="5000" min="0" required />
+          <span class="field-error" id="err_pricing_min">Please enter a valid minimum rate.</span>
         </div>
         <div class="form-group">
           <label class="form-label" for="pricing_max">Max. Rate (₹)</label>
           <input class="form-input" type="number" id="pricing_max" placeholder="25000" min="0" required />
+          <span class="field-error" id="err_pricing_max">Max rate must be greater than min rate.</span>
         </div>
       </div>
 
@@ -174,6 +204,7 @@
       <div class="form-group" style="margin-top:16px">
         <label class="form-label" for="bio">Short Bio</label>
         <textarea class="form-textarea" id="bio" placeholder="Tell brands who you are and what you do in 2–3 sentences…" required></textarea>
+        <span class="field-error" id="err_bio">Bio cannot be empty.</span>
       </div>
 
       <hr class="divider" />
@@ -193,11 +224,27 @@
     const alertBox  = document.getElementById('alertBox');
     const submitBtn = document.getElementById('submitBtn');
 
+    // ── Niche "Other" toggle ──────────────────────────────────────────
+    const nicheSelect = document.getElementById('niche');
+    const nicheOtherWrapper = document.getElementById('nicheOtherWrapper');
+    const nicheOtherInput   = document.getElementById('nicheOther');
+
+    nicheSelect.addEventListener('change', () => {
+      if (nicheSelect.value === 'Other') {
+        nicheOtherWrapper.style.display = 'block';
+        nicheOtherInput.required = true;
+        nicheOtherInput.focus();
+      } else {
+        nicheOtherWrapper.style.display = 'none';
+        nicheOtherInput.required = false;
+        nicheOtherInput.value = '';
+      }
+    });
+
     // ── Tag (past sponsors) input logic ──────────────────────────────
     let sponsors = [];
 
     function renderTags() {
-      // Remove existing tag elements (keep the input)
       document.querySelectorAll('.tag-item').forEach(t => t.remove());
       const input = document.getElementById('sponsorInput');
       const wrapper = document.getElementById('tagsWrapper');
@@ -229,6 +276,75 @@
       }
     });
 
+    // ── Form validation ───────────────────────────────────────────────
+    function clearErrors() {
+      document.querySelectorAll('.field-error').forEach(el => el.classList.remove('show'));
+      document.querySelectorAll('.form-input.invalid, .form-select.invalid').forEach(el => el.classList.remove('invalid'));
+    }
+
+    function showFieldError(fieldId, errId) {
+      const field = document.getElementById(fieldId);
+      const err   = document.getElementById(errId);
+      if (field) field.classList.add('invalid');
+      if (err)   err.classList.add('show');
+    }
+
+    function validateForm() {
+      clearErrors();
+      let valid = true;
+
+      const fullName      = document.getElementById('full_name').value.trim();
+      const platform      = document.getElementById('platform').value;
+      const handle        = document.getElementById('handle').value.trim();
+      const niche         = nicheSelect.value;
+      const nicheOther    = nicheOtherInput.value.trim();
+      const followers     = parseFloat(document.getElementById('followers').value);
+      const engRate       = parseFloat(document.getElementById('engagement_rate').value);
+      const pricingMin    = parseFloat(document.getElementById('pricing_min').value);
+      const pricingMax    = parseFloat(document.getElementById('pricing_max').value);
+      const bio           = document.getElementById('bio').value.trim();
+
+      if (!fullName) {
+        showFieldError('full_name', 'err_full_name');
+        valid = false;
+      }
+      if (!platform) {
+        showFieldError('platform', 'err_platform');
+        valid = false;
+      }
+      if (!handle) {
+        showFieldError('handle', 'err_handle');
+        valid = false;
+      }
+      if (!niche || (niche === 'Other' && !nicheOther)) {
+        showFieldError('niche', 'err_niche');
+        valid = false;
+      }
+      if (!followers || followers <= 0 || isNaN(followers)) {
+        showFieldError('followers', 'err_followers');
+        valid = false;
+      }
+      if (isNaN(engRate) || engRate < 0 || engRate > 100) {
+        showFieldError('engagement_rate', 'err_engagement_rate');
+        valid = false;
+      }
+      if (isNaN(pricingMin) || pricingMin < 0) {
+        showFieldError('pricing_min', 'err_pricing_min');
+        valid = false;
+      }
+      if (isNaN(pricingMax) || pricingMax <= pricingMin) {
+        showFieldError('pricing_max', 'err_pricing_max');
+        document.getElementById('err_pricing_max').textContent = 'Max rate must be greater than min rate.';
+        valid = false;
+      }
+      if (!bio) {
+        showFieldError('bio', 'err_bio');
+        valid = false;
+      }
+
+      return valid;
+    }
+
     // ── Pre-fill if profile already exists ───────────────────────────
     try {
       const profile = await API.getProfile();
@@ -236,7 +352,6 @@
         document.getElementById('full_name').value       = profile.full_name       || '';
         document.getElementById('platform').value        = profile.platform        || '';
         document.getElementById('handle').value          = profile.handle          || '';
-        document.getElementById('niche').value           = profile.niche           || '';
         document.getElementById('followers').value       = profile.followers       || '';
         document.getElementById('engagement_rate').value = profile.engagement_rate || '';
         document.getElementById('pricing_min').value     = profile.pricing_min     || '';
@@ -244,6 +359,17 @@
         document.getElementById('bio').value             = profile.bio             || '';
         sponsors = profile.past_sponsors || [];
         renderTags();
+
+        // Handle niche — check if stored value matches one of the options
+        const nicheVal = profile.niche || '';
+        const knownNiches = ['Finance','Fitness','Beauty','Tech','Food','Travel','Gaming','Fashion','Education','Entertainment'];
+        if (knownNiches.includes(nicheVal)) {
+          nicheSelect.value = nicheVal;
+        } else if (nicheVal) {
+          nicheSelect.value = 'Other';
+          nicheOtherWrapper.style.display = 'block';
+          nicheOtherInput.value = nicheVal;
+        }
       }
     } catch (_) {
       // No profile yet — that's fine, form starts empty
@@ -253,8 +379,15 @@
     document.getElementById('profileForm').addEventListener('submit', async (e) => {
       e.preventDefault();
 
+      if (!validateForm()) return;
+
       submitBtn.disabled = true;
       submitBtn.innerHTML = '<span class="spinner"></span> Saving…';
+
+      // Resolve final niche value
+      const nicheValue = nicheSelect.value === 'Other'
+        ? nicheOtherInput.value.trim()
+        : nicheSelect.value;
 
       // Build the payload matching backend ProfileInput model exactly
       const payload = {
@@ -262,7 +395,7 @@
         platform:        document.getElementById('platform').value,
         handle:          document.getElementById('handle').value.trim(),
         followers:       parseInt(document.getElementById('followers').value),
-        niche:           document.getElementById('niche').value,
+        niche:           nicheValue,
         engagement_rate: parseFloat(document.getElementById('engagement_rate').value),
         bio:             document.getElementById('bio').value.trim(),
         past_sponsors:   sponsors,

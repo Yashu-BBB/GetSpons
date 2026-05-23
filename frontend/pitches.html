@@ -70,19 +70,48 @@
     }
     .expand-btn:hover { text-decoration: underline; }
 
-    .pitch-body-preview {
+    /* Expandable section */
+    .pitch-expand-area {
       display: none;
       margin-top: 12px;
-      background: var(--gray-50);
+      border-top: 1px solid var(--gray-100);
+      padding-top: 12px;
+    }
+    .pitch-expand-area.open { display: block; }
+
+    /* Editable pitch fields inside pitch row */
+    .pitch-edit-subject {
+      width: 100%;
+      padding: 8px 10px;
+      border: 1.5px solid var(--purple-light);
       border-radius: var(--radius-sm);
-      padding: 14px;
+      font-family: inherit;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--purple-dark);
+      background: var(--purple-light);
+      margin-bottom: 8px;
+      transition: border-color 0.2s;
+    }
+    .pitch-edit-subject:focus { outline: none; border-color: var(--purple); background: var(--white); }
+
+    .pitch-edit-body {
+      width: 100%;
+      padding: 12px;
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius-sm);
+      font-family: inherit;
       font-size: 0.82rem;
       color: var(--gray-700);
       line-height: 1.7;
-      white-space: pre-wrap;
-      border-top: 1px solid var(--gray-100);
+      background: var(--gray-50);
+      resize: vertical;
+      min-height: 160px;
+      transition: border-color 0.2s;
     }
-    .pitch-body-preview.open { display: block; }
+    .pitch-edit-body:focus { outline: none; border-color: var(--purple); box-shadow: 0 0 0 3px var(--purple-light); }
+
+    .pitch-edit-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
 
     @media (max-width: 540px) {
       .summary-bar { grid-template-columns: 1fr 1fr; }
@@ -112,7 +141,7 @@
     <!-- Main -->
     <main class="main-content">
       <h1 class="page-title">My Pitches</h1>
-      <p class="page-subtitle">Track every brand outreach. Update statuses as you hear back.</p>
+      <p class="page-subtitle">Track every brand outreach. Edit, copy, and update statuses as you hear back.</p>
 
       <!-- Summary bar -->
       <div class="summary-bar" id="summaryBar">
@@ -124,7 +153,6 @@
 
       <!-- Pitch list -->
       <div id="pitchList">
-        <!-- Skeleton -->
         <div class="pitch-row"><div class="skeleton" style="height:60px"></div></div>
         <div class="pitch-row"><div class="skeleton" style="height:60px"></div></div>
         <div class="pitch-row"><div class="skeleton" style="height:60px"></div></div>
@@ -151,8 +179,9 @@
       return new Date(iso).toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' });
     }
 
-    // Map status → CSS class suffix
-    const statusColors = { draft:'gray', sent:'purple', replied:'gold', deal:'green' };
+    function escHtml(str) {
+      return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
 
     function renderSummary(pitches) {
       document.getElementById('cntTotal').textContent   = pitches.length;
@@ -168,89 +197,121 @@
         el.innerHTML = `
           <div class="empty-state">
             <div class="empty-icon">✉️</div>
-            <p>No pitches yet. Go find a brand and generate your first AI pitch!</p>
+            <p>You haven't pitched any brands yet. Go to Browse Brands to get started.</p>
             <a href="brands.html" class="btn btn-primary btn-sm">Browse Brands →</a>
           </div>`;
         return;
       }
 
-      el.innerHTML = pitches.map((p, i) => `
+      el.innerHTML = pitches.map((p) => `
         <div class="pitch-row" id="row-${p.id}">
           <div>
-            <div class="pitch-row-brand">
-              ${p.brands?.name || 'Unknown Brand'}
-            </div>
-            <div class="pitch-row-subject">${p.subject}</div>
+            <div class="pitch-row-brand">${escHtml(p.brands?.name || 'Unknown Brand')}</div>
+            <div class="pitch-row-subject" id="subj-display-${p.id}">${escHtml(p.subject)}</div>
             <div class="pitch-row-date">${fmtDate(p.created_at)}</div>
 
-            <!-- Expandable body -->
-            <button class="expand-btn" onclick="toggleBody('${p.id}')">Show email ▾</button>
-            <div class="pitch-body-preview" id="body-${p.id}">${p.body}</div>
+            <button class="expand-btn" id="expandBtn-${p.id}" onclick="toggleExpand('${p.id}')">✏️ Edit / View email ▾</button>
+
+            <!-- Editable expand area -->
+            <div class="pitch-expand-area" id="expand-${p.id}">
+              <div style="font-size:0.72rem;font-weight:700;color:var(--purple);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px">Subject Line</div>
+              <input class="pitch-edit-subject" id="subj-${p.id}" type="text" value="${escHtml(p.subject)}" placeholder="Subject line" />
+
+              <div style="font-size:0.72rem;font-weight:700;color:var(--gray-500);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px">Email Body</div>
+              <textarea class="pitch-edit-body" id="body-${p.id}" placeholder="Email body">${escHtml(p.body)}</textarea>
+
+              <div class="alert" id="pitchAlert-${p.id}" style="margin-top:8px;font-size:0.8rem"></div>
+
+              <div class="pitch-edit-actions">
+                <button class="btn btn-primary btn-sm" id="saveBtn-${p.id}" onclick="savePitch('${p.id}')">💾 Save Changes</button>
+                <button class="btn btn-outline btn-sm" onclick="copyPitch('${p.id}')">📋 Copy Email</button>
+              </div>
+            </div>
           </div>
 
           <div class="pitch-row-right">
-            <!-- Status dropdown — calls PATCH /api/pitches/{id} on change -->
             <select
               class="status-select"
               id="status-${p.id}"
               onchange="updateStatus('${p.id}', this.value)"
-              title="Update pitch status"
             >
               <option value="draft"   ${p.status==='draft'   ? 'selected':''}>📝 Draft</option>
               <option value="sent"    ${p.status==='sent'    ? 'selected':''}>📤 Sent</option>
               <option value="replied" ${p.status==='replied' ? 'selected':''}>💬 Replied</option>
               <option value="deal"    ${p.status==='deal'    ? 'selected':''}>🎉 Deal!</option>
             </select>
-
-            <button
-              class="btn btn-ghost btn-sm"
-              onclick="copyPitch('${p.id}')"
-              title="Copy full email to clipboard"
-            >📋 Copy</button>
           </div>
         </div>
       `).join('');
     }
 
-    // ── Toggle email body ─────────────────────────────────────────────
-    window.toggleBody = function(id) {
-      const el = document.getElementById(`body-${id}`);
-      const btn = el.previousElementSibling;
-      el.classList.toggle('open');
-      btn.textContent = el.classList.contains('open') ? 'Hide email ▴' : 'Show email ▾';
+    // ── Toggle expand ─────────────────────────────────────────────────
+    window.toggleExpand = function(id) {
+      const area = document.getElementById(`expand-${id}`);
+      const btn  = document.getElementById(`expandBtn-${id}`);
+      const open = area.classList.toggle('open');
+      btn.textContent = open ? '✏️ Hide email ▴' : '✏️ Edit / View email ▾';
+    };
+
+    // ── Save pitch edits ──────────────────────────────────────────────
+    window.savePitch = async function(id) {
+      const btn     = document.getElementById(`saveBtn-${id}`);
+      const alert   = document.getElementById(`pitchAlert-${id}`);
+      const subject = document.getElementById(`subj-${id}`)?.value?.trim() || '';
+      const body    = document.getElementById(`body-${id}`)?.value?.trim() || '';
+
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span>';
+
+      try {
+        await API.updatePitchContent(id, subject, body);
+        // Update display subject
+        const dispEl = document.getElementById(`subj-display-${id}`);
+        if (dispEl) dispEl.textContent = subject;
+
+        alert.textContent = '✅ Saved!';
+        alert.className = 'alert alert-success show';
+        setTimeout(() => alert.classList.remove('show'), 3000);
+      } catch (err) {
+        alert.textContent = err.message || 'Could not save.';
+        alert.className = 'alert alert-error show';
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '💾 Save Changes';
+      }
     };
 
     // ── Copy pitch email to clipboard ─────────────────────────────────
     window.copyPitch = async function(id) {
-      const subject = document.getElementById(`status-${id}`)?.closest('.pitch-row').querySelector('.pitch-row-subject')?.textContent || '';
-      const body    = document.getElementById(`body-${id}`)?.textContent || '';
+      const subject = document.getElementById(`subj-${id}`)?.value || '';
+      const body    = document.getElementById(`body-${id}`)?.value || '';
       try {
         await navigator.clipboard.writeText(`Subject: ${subject}\n\n${body}`);
-        const btn = document.getElementById(`status-${id}`)?.closest('.pitch-row').querySelector('[onclick*="copyPitch"]');
-        if (btn) { btn.textContent = '✅ Copied!'; setTimeout(() => btn.textContent = '📋 Copy', 2000); }
+        const btn = document.querySelector(`#row-${id} [onclick*="copyPitch"]`);
+        if (btn) { btn.textContent = '✅ Copied!'; setTimeout(() => btn.textContent = '📋 Copy Email', 2000); }
+        // Mark as sent
+        await API.updatePitchStatus(id, 'sent').catch(() => {});
+        const sel = document.getElementById(`status-${id}`);
+        if (sel) sel.value = 'sent';
       } catch (_) {
-        alert('Copy failed. Open the email body and copy manually.');
+        alert('Copy failed. Select the email body text and copy manually.');
       }
     };
 
     // ── Update status ─────────────────────────────────────────────────
     window.updateStatus = async function(pitchId, newStatus) {
       try {
-        // PATCH /api/pitches/{pitch_id}  { status }
         await API.updatePitchStatus(pitchId, newStatus);
-        // Re-render the summary numbers
-        // (instead of full reload, just tweak counts in place)
         loadPitches();
       } catch (err) {
         alert(`Could not update status: ${err.message}`);
-        loadPitches(); // reset to saved state
+        loadPitches();
       }
     };
 
     // ── Load pitches ──────────────────────────────────────────────────
     async function loadPitches() {
       try {
-        // GET /api/pitches/mine
         const pitches = await API.getMyPitches();
         renderSummary(pitches);
         renderPitches(pitches);
@@ -258,7 +319,7 @@
         document.getElementById('pitchList').innerHTML = `
           <div class="empty-state">
             <div class="empty-icon">⚠️</div>
-            <p>${err.message || 'Could not load pitches.'}</p>
+            <p>${escHtml(err.message) || 'Could not load pitches.'}</p>
           </div>`;
       }
     }

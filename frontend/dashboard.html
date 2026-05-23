@@ -8,6 +8,23 @@
   <style>
     body { background: var(--gray-50); }
 
+    /* ── Incomplete profile banner ── */
+    .profile-banner {
+      display: none;
+      background: linear-gradient(135deg, var(--purple-light), #e0e7ff);
+      border: 1.5px solid #c7d2fe;
+      border-radius: var(--radius);
+      padding: 14px 20px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .profile-banner.hidden { display: none; }
+    .profile-banner-text { font-size: 0.88rem; color: var(--purple-dark); font-weight: 500; }
+    .profile-banner-text strong { font-weight: 700; }
+
     /* ── Stats grid ── */
     .stats-grid {
       display: grid;
@@ -76,6 +93,50 @@
     .pricing-table td { padding: 10px 12px; border-bottom: 1px solid var(--gray-100); color: var(--gray-700); }
     .pricing-table tr:last-child td { border-bottom: none; }
 
+    /* ── Editable media kit fields ── */
+    .edit-field {
+      width: 100%;
+      padding: 8px 10px;
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius-sm);
+      font-family: inherit;
+      font-size: 0.88rem;
+      color: var(--gray-900);
+      background: var(--white);
+      transition: border-color 0.2s, box-shadow 0.2s;
+      resize: vertical;
+    }
+    .edit-field:focus {
+      outline: none;
+      border-color: var(--purple);
+      box-shadow: 0 0 0 3px var(--purple-light);
+    }
+    .edit-label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--purple);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 5px;
+      display: block;
+    }
+    .edit-group { margin-bottom: 14px; }
+
+    .pricing-edit-row { display: flex; gap: 8px; align-items: center; margin-bottom: 6px; }
+    .pricing-edit-row input { flex: 1; }
+    .pricing-del-btn {
+      background: none;
+      border: none;
+      color: var(--red);
+      cursor: pointer;
+      font-size: 1rem;
+      padding: 4px;
+      flex-shrink: 0;
+    }
+    .pricing-del-btn:hover { opacity: 0.7; }
+
+    .mk-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--gray-200); }
+
     /* ── Recent pitches ── */
     .pitch-item {
       display: flex;
@@ -94,6 +155,31 @@
     /* ── Loading skeleton ── */
     .skeleton { background: linear-gradient(90deg, var(--gray-100) 25%, var(--gray-50) 50%, var(--gray-100) 75%); background-size: 200% 100%; animation: shimmer 1.2s infinite; border-radius: var(--radius-sm); }
     @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+    /* ── Guidelines modal content ── */
+    .guidelines-step {
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--gray-100);
+    }
+    .guidelines-step:last-child { border-bottom: none; }
+    .guidelines-num {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--purple-light);
+      color: var(--purple-dark);
+      font-weight: 700;
+      font-size: 0.85rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .guidelines-text strong { display: block; font-size: 0.9rem; margin-bottom: 3px; }
+    .guidelines-text p { font-size: 0.82rem; color: var(--gray-500); }
 
     @media (max-width: 640px) {
       .quick-actions, .mediakit-grid { grid-template-columns: 1fr; }
@@ -123,9 +209,16 @@
       <h1 class="page-title" id="greeting">Hey there 👋</h1>
       <p class="page-subtitle" id="subtitle">Here's your creator overview.</p>
 
+      <!-- Incomplete profile banner -->
+      <div class="profile-banner hidden" id="profileBanner">
+        <div class="profile-banner-text">
+          <strong>Complete your profile to unlock all features</strong> — your media kit and pitch generator need your stats.
+        </div>
+        <a href="profile.html" class="btn btn-primary btn-sm" style="flex-shrink:0">Complete Profile →</a>
+      </div>
+
       <!-- Stats -->
       <div class="stats-grid" id="statsGrid">
-        <!-- Filled by JS -->
         <div class="stat-card"><div class="skeleton" style="height:16px;width:60%;margin-bottom:10px"></div><div class="skeleton" style="height:28px;width:40%"></div></div>
         <div class="stat-card"><div class="skeleton" style="height:16px;width:60%;margin-bottom:10px"></div><div class="skeleton" style="height:28px;width:40%"></div></div>
         <div class="stat-card"><div class="skeleton" style="height:16px;width:60%;margin-bottom:10px"></div><div class="skeleton" style="height:28px;width:40%"></div></div>
@@ -140,7 +233,10 @@
             <div class="action-title">Download Media Kit</div>
             <div class="action-desc">Generate your AI-powered PDF and send it to brands.</div>
           </div>
-          <button class="btn btn-primary btn-sm" id="downloadKitBtn">Download PDF</button>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn btn-primary btn-sm" id="downloadKitBtn">Download PDF</button>
+            <button class="btn btn-ghost btn-sm" id="guidelinesBtn">📖 How to use</button>
+          </div>
         </div>
         <div class="action-card" style="cursor:pointer" onclick="window.location.href='brands.html'">
           <div class="action-icon">🔍</div>
@@ -152,14 +248,15 @@
         </div>
       </div>
 
-      <!-- Media Kit Preview -->
+      <!-- Media Kit Edit Section -->
       <div class="mediakit-section">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
-          <h2 style="font-size:1.1rem">Your Media Kit Preview</h2>
-          <button class="btn btn-ghost btn-sm" id="refreshKitBtn">🔄 Refresh</button>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:10px">
+          <h2 style="font-size:1.1rem">Your Media Kit</h2>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-ghost btn-sm" id="generateKitBtn">✨ Generate New</button>
+          </div>
         </div>
         <div class="mediakit-content" id="mediakitContent">
-          <!-- Filled by JS -->
           <div class="skeleton" style="height:20px;width:70%;margin-bottom:12px"></div>
           <div class="skeleton" style="height:14px;width:100%;margin-bottom:8px"></div>
           <div class="skeleton" style="height:14px;width:85%"></div>
@@ -190,6 +287,46 @@
     <a href="profile.html"><span class="icon">👤</span>Profile</a>
   </nav>
 
+  <!-- ── Guidelines Modal ── -->
+  <div class="modal-backdrop" id="guidelinesModal">
+    <div class="modal">
+      <button class="modal-close" id="guidelinesClose">✕</button>
+      <div class="modal-title">📖 How to use your Media Kit</div>
+      <p style="font-size:0.85rem;color:var(--gray-500);margin-bottom:16px">Your media kit is your professional pitch to brands. Here's how to get the most out of it.</p>
+
+      <div class="guidelines-step">
+        <div class="guidelines-num">1</div>
+        <div class="guidelines-text">
+          <strong>Share it with brands via email</strong>
+          <p>Download your PDF and attach it to any brand outreach email. A polished media kit dramatically increases response rates.</p>
+        </div>
+      </div>
+      <div class="guidelines-step">
+        <div class="guidelines-num">2</div>
+        <div class="guidelines-text">
+          <strong>Attach it to your pitch emails</strong>
+          <p>When you generate a pitch from the Brands page, always attach your media kit PDF. Brands want to see your stats upfront.</p>
+        </div>
+      </div>
+      <div class="guidelines-step">
+        <div class="guidelines-num">3</div>
+        <div class="guidelines-text">
+          <strong>Update it regularly as your stats grow</strong>
+          <p>Every time your follower count or engagement rate improves, regenerate your media kit. Fresh stats show brands you're growing.</p>
+        </div>
+      </div>
+      <div class="guidelines-step">
+        <div class="guidelines-num">4</div>
+        <div class="guidelines-text">
+          <strong>Edit the copy to match your voice</strong>
+          <p>The AI writes a great first draft — but personalise the headline, bio and "Why Partner" section to sound authentically you.</p>
+        </div>
+      </div>
+
+      <button class="btn btn-primary btn-full" style="margin-top:20px" onclick="document.getElementById('guidelinesModal').classList.remove('open')">Got it!</button>
+    </div>
+  </div>
+
   <script type="module">
     import { API, getToken } from './js/api.js';
 
@@ -197,6 +334,18 @@
     if (!getToken()) window.location.href = 'login.html';
 
     document.getElementById('logoutBtn')?.addEventListener('click', () => API.logout());
+
+    // Guidelines modal
+    document.getElementById('guidelinesBtn').addEventListener('click', () => {
+      document.getElementById('guidelinesModal').classList.add('open');
+    });
+    document.getElementById('guidelinesClose').addEventListener('click', () => {
+      document.getElementById('guidelinesModal').classList.remove('open');
+    });
+    document.getElementById('guidelinesModal').addEventListener('click', e => {
+      if (e.target === document.getElementById('guidelinesModal'))
+        document.getElementById('guidelinesModal').classList.remove('open');
+    });
 
     // ── Format helpers ────────────────────────────────────────────────
     function fmtFollowers(n) {
@@ -206,8 +355,13 @@
     }
 
     function statusClass(s) {
-      const map = { draft:'gray', sent:'badge-green', replied:'badge-gold', deal:'badge-green' };
+      const map = { draft:'badge-gray', sent:'badge-purple', replied:'badge-gold', deal:'badge-green' };
       return map[s] || 'badge-gray';
+    }
+
+    // ── Check if profile is complete ──────────────────────────────────
+    function isProfileComplete(p) {
+      return !!(p && p.handle && p.followers && p.niche && p.platform);
     }
 
     // ── Load profile + stats ──────────────────────────────────────────
@@ -215,11 +369,13 @@
       try {
         const p = await API.getProfile();
 
-        // Greeting
+        if (!isProfileComplete(p)) {
+          document.getElementById('profileBanner').classList.remove('hidden');
+        }
+
         document.getElementById('greeting').textContent = `Hey, ${p.full_name?.split(' ')[0]} 👋`;
         document.getElementById('subtitle').textContent = `${p.niche} creator on ${p.platform}`;
 
-        // Stats
         document.getElementById('statsGrid').innerHTML = `
           <div class="stat-card">
             <div class="stat-label">Followers</div>
@@ -243,7 +399,8 @@
           </div>
         `;
       } catch (err) {
-        // Profile not set up yet
+        // Profile not set up yet — show banner
+        document.getElementById('profileBanner').classList.remove('hidden');
         document.getElementById('statsGrid').innerHTML = `
           <div class="stat-card" style="grid-column:1/-1;text-align:center;padding:32px">
             <p style="color:var(--gray-500);margin-bottom:12px">Complete your profile to see your stats.</p>
@@ -252,67 +409,156 @@
       }
     }
 
-    // ── Load Media Kit ────────────────────────────────────────────────
-    async function loadMediaKit() {
+    // ── Render editable media kit ─────────────────────────────────────
+    let currentMK = null; // in-memory copy being edited
+
+    function renderEditableMediaKit(mk) {
+      currentMK = JSON.parse(JSON.stringify(mk)); // deep copy
       const el = document.getElementById('mediakitContent');
+
+      el.innerHTML = `
+        <div class="edit-group">
+          <label class="edit-label">Headline</label>
+          <input class="edit-field" id="mk_headline" value="${escHtml(mk.headline || '')}" placeholder="Your headline" style="font-weight:700;font-size:1rem" />
+        </div>
+
+        <div class="edit-group">
+          <label class="edit-label">Short Bio</label>
+          <textarea class="edit-field" id="mk_bio" rows="3" placeholder="Your short bio">${escHtml(mk.bio_short || '')}</textarea>
+        </div>
+
+        <div class="mk-stats-row">
+          ${(mk.key_stats || []).map(s => `
+            <div class="mk-stat">
+              <div class="mk-stat-val">${s.value}</div>
+              <div class="mk-stat-lbl">${s.label}</div>
+            </div>`).join('')}
+        </div>
+
+        <div class="mediakit-grid" style="margin-top:16px">
+          <div class="mk-block">
+            <div class="edit-label" style="margin-bottom:5px">Audience Description</div>
+            <textarea class="edit-field" id="mk_audience" rows="3" placeholder="Describe your audience">${escHtml(mk.audience_description || '')}</textarea>
+          </div>
+          <div class="mk-block">
+            <div class="edit-label" style="margin-bottom:5px">Content Style</div>
+            <textarea class="edit-field" id="mk_content_style" rows="3" placeholder="Your content style">${escHtml(mk.content_style || '')}</textarea>
+          </div>
+          <div class="mk-block">
+            <div class="edit-label" style="margin-bottom:5px">Why Partner?</div>
+            <textarea class="edit-field" id="mk_why_partner" rows="3" placeholder="Why should brands partner with you?">${escHtml(mk.why_partner || '')}</textarea>
+          </div>
+          <div class="mk-block">
+            <div class="edit-label" style="margin-bottom:5px">Call to Action</div>
+            <textarea class="edit-field" id="mk_cta" rows="3" placeholder="Your CTA">${escHtml(mk.cta || '')}</textarea>
+          </div>
+        </div>
+
+        <div style="margin-top:20px">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+            <div class="edit-label" style="margin:0">Sponsorship Packages</div>
+            <button type="button" class="btn btn-ghost btn-sm" id="addPricingRowBtn">+ Add Row</button>
+          </div>
+          <div id="pricingRowsEditor">
+            ${(mk.pricing_table || []).map((row, i) => renderPricingRow(row, i)).join('')}
+          </div>
+        </div>
+
+        <div class="mk-actions">
+          <button class="btn btn-primary" id="saveMKBtn">💾 Save Changes</button>
+          <button class="btn btn-gold" id="downloadKitBtn2">⬇ Download PDF</button>
+        </div>
+
+        <div class="alert" id="mkAlert" style="margin-top:12px"></div>
+      `;
+
+      bindMKEvents();
+    }
+
+    function renderPricingRow(row, i) {
+      return `
+        <div class="pricing-edit-row" data-row="${i}">
+          <input class="form-input" placeholder="Package" value="${escHtml(row.package||'')}" data-field="package" style="font-size:0.82rem;padding:8px 10px" />
+          <input class="form-input" placeholder="Deliverable" value="${escHtml(row.deliverable||'')}" data-field="deliverable" style="font-size:0.82rem;padding:8px 10px" />
+          <input class="form-input" placeholder="Price" value="${escHtml(row.price||'')}" data-field="price" style="font-size:0.82rem;padding:8px 10px;max-width:100px" />
+          <button type="button" class="pricing-del-btn" data-del="${i}" title="Remove row">✕</button>
+        </div>`;
+    }
+
+    function bindMKEvents() {
+      // Add pricing row
+      document.getElementById('addPricingRowBtn')?.addEventListener('click', () => {
+        const editor = document.getElementById('pricingRowsEditor');
+        const newIdx = editor.children.length;
+        const div = document.createElement('div');
+        div.innerHTML = renderPricingRow({ package: '', deliverable: '', price: '' }, newIdx);
+        editor.appendChild(div.firstElementChild);
+        bindDeleteBtns();
+      });
+
+      bindDeleteBtns();
+
+      // Save Changes
+      document.getElementById('saveMKBtn')?.addEventListener('click', saveMK);
+
+      // Download PDF
+      document.getElementById('downloadKitBtn2')?.addEventListener('click', downloadPDF);
+    }
+
+    function bindDeleteBtns() {
+      document.querySelectorAll('.pricing-del-btn').forEach(btn => {
+        btn.onclick = () => btn.closest('.pricing-edit-row').remove();
+      });
+    }
+
+    function collectMKPayload() {
+      // Collect pricing rows from DOM
+      const pricingRows = [];
+      document.querySelectorAll('.pricing-edit-row').forEach(row => {
+        const pkg  = row.querySelector('[data-field="package"]')?.value?.trim() || '';
+        const del  = row.querySelector('[data-field="deliverable"]')?.value?.trim() || '';
+        const pri  = row.querySelector('[data-field="price"]')?.value?.trim() || '';
+        if (pkg || del || pri) pricingRows.push({ package: pkg, deliverable: del, price: pri });
+      });
+
+      return {
+        headline:             document.getElementById('mk_headline')?.value?.trim() || '',
+        bio_short:            document.getElementById('mk_bio')?.value?.trim() || '',
+        audience_description: document.getElementById('mk_audience')?.value?.trim() || '',
+        content_style:        document.getElementById('mk_content_style')?.value?.trim() || '',
+        why_partner:          document.getElementById('mk_why_partner')?.value?.trim() || '',
+        cta:                  document.getElementById('mk_cta')?.value?.trim() || '',
+        pricing_table:        pricingRows,
+      };
+    }
+
+    async function saveMK() {
+      const btn = document.getElementById('saveMKBtn');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span> Saving…';
+
       try {
-        // POST /api/mediakit/generate
-        const mk = await API.generateMediaKit();
-
-        // Render AI-generated content
-        el.innerHTML = `
-          <h3 style="font-size:1.05rem;margin-bottom:8px">${mk.headline}</h3>
-          <p style="font-size:0.88rem;color:var(--gray-500);margin-bottom:16px">${mk.bio_short}</p>
-
-          <div class="mk-stats-row">
-            ${(mk.key_stats || []).map(s => `
-              <div class="mk-stat">
-                <div class="mk-stat-val">${s.value}</div>
-                <div class="mk-stat-lbl">${s.label}</div>
-              </div>`).join('')}
-          </div>
-
-          <div class="mediakit-grid">
-            <div class="mk-block">
-              <div class="mk-block-title">Audience</div>
-              <div class="mk-block-text">${mk.audience_description}</div>
-            </div>
-            <div class="mk-block">
-              <div class="mk-block-title">Why Partner?</div>
-              <div class="mk-block-text">${mk.why_partner}</div>
-            </div>
-          </div>
-
-          <div style="margin-top:20px">
-            <div class="mk-block-title" style="margin-bottom:8px">Sponsorship Packages</div>
-            <table class="pricing-table">
-              <thead><tr><th>Package</th><th>Deliverable</th><th>Price</th></tr></thead>
-              <tbody>
-                ${(mk.pricing_table || []).map(row => `
-                  <tr><td><strong>${row.package}</strong></td><td>${row.deliverable}</td><td style="color:var(--purple);font-weight:600">${row.price}</td></tr>
-                `).join('')}
-              </tbody>
-            </table>
-          </div>
-
-          <p style="margin-top:16px;font-style:italic;color:var(--gray-500);font-size:0.85rem">${mk.cta}</p>
-        `;
+        await API.updateMediaKit(collectMKPayload());
+        const alert = document.getElementById('mkAlert');
+        alert.textContent = '✅ Media kit saved!';
+        alert.className = 'alert alert-success show';
+        setTimeout(() => alert.classList.remove('show'), 3000);
       } catch (err) {
-        el.innerHTML = `
-          <div class="empty-state">
-            <div class="empty-icon">📄</div>
-            <p>Complete your profile first to generate your media kit.</p>
-            <a href="profile.html" class="btn btn-primary btn-sm">Set up profile →</a>
-          </div>`;
+        const alert = document.getElementById('mkAlert');
+        alert.textContent = err.message || 'Could not save. Try again.';
+        alert.className = 'alert alert-error show';
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '💾 Save Changes';
       }
     }
 
-    // ── Load PDF download button ──────────────────────────────────────
-    document.getElementById('downloadKitBtn').addEventListener('click', async (e) => {
-      e.currentTarget.disabled = true;
-      e.currentTarget.innerHTML = '<span class="spinner"></span> Generating…';
+    async function downloadPDF() {
+      const btn = document.getElementById('downloadKitBtn2') || document.getElementById('downloadKitBtn');
+      if (!btn) return;
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span> Generating…';
       try {
-        // POST /api/mediakit/pdf — returns a PDF blob
         const { blob } = await API.downloadMediaKitPDF();
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
@@ -323,18 +569,64 @@
       } catch (err) {
         alert('Could not generate PDF. Make sure your profile is complete.');
       } finally {
-        e.currentTarget.disabled = false;
-        e.currentTarget.textContent = 'Download PDF';
+        btn.disabled = false;
+        btn.innerHTML = btn.id === 'downloadKitBtn2' ? '⬇ Download PDF' : 'Download PDF';
       }
-    });
+    }
 
-    document.getElementById('refreshKitBtn').addEventListener('click', loadMediaKit);
+    // ── Download PDF button (quick actions) ───────────────────────────
+    document.getElementById('downloadKitBtn').addEventListener('click', downloadPDF);
+
+    // ── Load/Generate Media Kit ───────────────────────────────────────
+    async function loadMediaKit(forceGenerate = false) {
+      const el = document.getElementById('mediakitContent');
+      el.innerHTML = `
+        <div class="skeleton" style="height:20px;width:70%;margin-bottom:12px"></div>
+        <div class="skeleton" style="height:14px;width:100%;margin-bottom:8px"></div>
+        <div class="skeleton" style="height:14px;width:85%"></div>`;
+
+      try {
+        let mk = null;
+
+        if (!forceGenerate) {
+          // Try to load saved version first
+          try {
+            mk = await API.getSavedMediaKit();
+          } catch (_) {
+            // No saved kit, fall through to generate
+          }
+        }
+
+        if (!mk) {
+          mk = await API.generateMediaKit();
+        }
+
+        renderEditableMediaKit(mk);
+
+      } catch (err) {
+        el.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-icon">📄</div>
+            <p>Generate your media kit to get started.</p>
+            <a href="profile.html" class="btn btn-primary btn-sm">Complete Profile First →</a>
+          </div>`;
+      }
+    }
+
+    // Generate new button
+    document.getElementById('generateKitBtn').addEventListener('click', async () => {
+      const btn = document.getElementById('generateKitBtn');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner spinner-purple"></span> Generating…';
+      await loadMediaKit(true);
+      btn.disabled = false;
+      btn.textContent = '✨ Generate New';
+    });
 
     // ── Load recent pitches ───────────────────────────────────────────
     async function loadPitches() {
       const el = document.getElementById('pitchList');
       try {
-        // GET /api/pitches/mine
         const pitches = await API.getMyPitches();
         const recent = pitches.slice(0, 5);
 
@@ -342,7 +634,7 @@
           el.innerHTML = `
             <div class="empty-state">
               <div class="empty-icon">✉️</div>
-              <p>No pitches yet. Find a brand and generate your first AI pitch!</p>
+              <p>You haven't pitched any brands yet. Go to Browse Brands to get started.</p>
               <a href="brands.html" class="btn btn-primary btn-sm">Browse Brands →</a>
             </div>`;
           return;
@@ -361,6 +653,11 @@
       } catch (_) {
         el.innerHTML = `<p style="color:var(--gray-500);font-size:0.88rem;padding:12px 0">Could not load pitches.</p>`;
       }
+    }
+
+    // ── Utility ───────────────────────────────────────────────────────
+    function escHtml(str) {
+      return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
     }
 
     // ── Init ──────────────────────────────────────────────────────────

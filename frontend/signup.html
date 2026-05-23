@@ -44,6 +44,39 @@
       color: var(--gray-500);
     }
     .auth-footer a { color: var(--purple); font-weight: 600; }
+
+    /* Onboarding steps indicator */
+    .onboarding-steps {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 24px;
+    }
+    .step {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.75rem;
+      color: var(--gray-300);
+      font-weight: 600;
+    }
+    .step.active { color: var(--purple); }
+    .step.done   { color: var(--green); }
+    .step-num {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: var(--gray-200);
+      color: var(--gray-500);
+      font-size: 0.7rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .step.active .step-num { background: var(--purple); color: #fff; }
+    .step-sep { width: 24px; height: 1.5px; background: var(--gray-200); }
   </style>
 </head>
 <body>
@@ -51,8 +84,26 @@
     <div class="auth-logo">get<span>Spons</span></div>
     <p class="auth-tagline">Create your free creator account</p>
 
+    <!-- Onboarding progress indicator -->
+    <div class="onboarding-steps">
+      <div class="step active">
+        <div class="step-num">1</div>
+        Create Account
+      </div>
+      <div class="step-sep"></div>
+      <div class="step">
+        <div class="step-num">2</div>
+        Your Profile
+      </div>
+      <div class="step-sep"></div>
+      <div class="step">
+        <div class="step-num">3</div>
+        Media Kit
+      </div>
+    </div>
+
     <!-- Error / Success messages -->
-    <div class="alert alert-error" id="alertBox"></div>
+    <div class="alert" id="alertBox"></div>
 
     <form class="auth-form" id="signupForm">
 
@@ -92,7 +143,7 @@
   </div>
 
   <script type="module">
-    import { API, getToken } from './js/api.js';
+    import { API, getToken, saveToken, saveUserId } from './js/api.js';
 
     // If user is already logged in, redirect to dashboard
     if (getToken()) window.location.href = 'dashboard.html';
@@ -101,7 +152,7 @@
     const alertBox  = document.getElementById('alertBox');
     const submitBtn = document.getElementById('submitBtn');
 
-    // ── Show / hide error message ─────────────────────────────────────
+    // ── Show / hide messages ──────────────────────────────────────────
     function showError(msg) {
       alertBox.textContent = msg;
       alertBox.className = 'alert alert-error show';
@@ -118,19 +169,30 @@
       const email    = document.getElementById('email').value.trim();
       const password = document.getElementById('password').value;
 
-      // Show loading state
       submitBtn.disabled = true;
       submitBtn.innerHTML = '<span class="spinner"></span> Creating account…';
 
       try {
         const result = await API.signup(email, password);
 
-        // Backend returns { success: true, user_id: "..." }
         if (result.success) {
-          showSuccess('Account created! Redirecting you to log in…');
-          setTimeout(() => window.location.href = 'login.html', 1500);
+          // Auto-login after signup so user lands on profile with a session
+          showSuccess('Account created! Logging you in…');
+
+          try {
+            // Attempt immediate login so they have a token for profile page
+            await API.login(email, password);
+          } catch (_) {
+            // If auto-login fails, that's okay; redirect to login page instead
+            setTimeout(() => window.location.href = 'login.html', 1500);
+            return;
+          }
+
+          // ✅ Redirect to profile.html to complete onboarding
+          showSuccess('✅ Account created! Let\'s set up your profile…');
+          setTimeout(() => window.location.href = 'profile.html', 1200);
+
         } else {
-          // Backend returned { error: "..." }
           showError(result.error || 'Signup failed. Please try again.');
         }
 

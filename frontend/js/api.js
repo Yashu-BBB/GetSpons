@@ -42,6 +42,15 @@ function authHeader() {
   return { Authorization: `Bearer ${token}` };
 }
 
+// ─── Session expiry handler ──────────────────────────────────────────────────
+// Called whenever any API request returns a 401 Unauthorized response.
+
+function handleSessionExpired() {
+  alert("Session expired, please login again");
+  clearToken();
+  window.location.href = "/login.html";
+}
+
 // ─── Generic fetch wrapper ────────────────────────────────────────────────────
 // Handles JSON parsing and surfaces error messages consistently.
 
@@ -57,6 +66,13 @@ async function request(method, path, body = null, extraHeaders = {}) {
   if (body) options.body = JSON.stringify(body);
 
   const res = await fetch(`${BASE_URL}${path}`, options);
+
+  // ── 401 → session expired ──────────────────────────────────────────
+  if (res.status === 401) {
+    handleSessionExpired();
+    // Throw so the calling code doesn't try to use a null response
+    throw new Error("Session expired");
+  }
 
   // PDF endpoint returns binary, not JSON
   if (res.headers.get("Content-Type")?.includes("application/pdf")) {
@@ -124,6 +140,19 @@ export const API = {
     return request("POST", "/api/mediakit/generate");
   },
 
+  async getSavedMediaKit() {
+    // GET /api/mediakit/saved  (requires Authorization header)
+    // Returns saved media kit if it exists, or null/404
+    return request("GET", "/api/mediakit/saved");
+  },
+
+  async updateMediaKit(mediakitData) {
+    // PATCH /api/mediakit/update  (requires Authorization header)
+    // mediakitData: { headline, bio_short, audience_description,
+    //                 content_style, why_partner, cta, pricing_table }
+    return request("PATCH", "/api/mediakit/update", mediakitData);
+  },
+
   async downloadMediaKitPDF() {
     // POST /api/mediakit/pdf  (requires Authorization header)
     // Returns: { ok: true, blob: Blob }  ← binary PDF
@@ -165,5 +194,11 @@ export const API = {
     // PATCH /api/pitches/{pitch_id}
     // status: "draft" | "sent" | "replied" | "deal"
     return request("PATCH", `/api/pitches/${pitchId}`, { status });
+  },
+
+  async updatePitchContent(pitchId, subject, body) {
+    // PATCH /api/pitches/{pitch_id}/content
+    // Updates subject and body text of a pitch
+    return request("PATCH", `/api/pitches/${pitchId}/content`, { subject, body });
   },
 };
