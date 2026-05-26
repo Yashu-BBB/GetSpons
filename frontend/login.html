@@ -6,7 +6,14 @@
   <title>Log In — getSpons</title>
   <link rel="stylesheet" href="css/shared.css" />
   <style>
-    body { background: var(--gray-50); display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+    body {
+      background: var(--gray-50);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 16px;
+    }
 
     .auth-card {
       background: var(--white);
@@ -44,6 +51,35 @@
       color: var(--gray-500);
     }
     .auth-footer a { color: var(--purple); font-weight: 600; }
+
+    /* Password toggle wrapper */
+    .input-password-wrap {
+      position: relative;
+    }
+    .input-password-wrap .form-input {
+      padding-right: 44px; /* space for toggle button */
+    }
+    .password-toggle {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--gray-500);
+      padding: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: color 0.15s;
+    }
+    .password-toggle:hover { color: var(--purple); }
+    .password-toggle svg { width: 18px; height: 18px; }
+
+    @media (max-width: 480px) {
+      .auth-card { padding: 28px 20px; }
+    }
   </style>
 </head>
 <body>
@@ -69,14 +105,35 @@
 
       <div class="form-group">
         <label class="form-label" for="password">Password</label>
-        <input
-          class="form-input"
-          type="password"
-          id="password"
-          placeholder="Your password"
-          required
-          autocomplete="current-password"
-        />
+        <!-- Password input with show/hide toggle -->
+        <div class="input-password-wrap">
+          <input
+            class="form-input"
+            type="password"
+            id="password"
+            placeholder="Your password"
+            required
+            autocomplete="current-password"
+          />
+          <button type="button" class="password-toggle" id="pwToggle" aria-label="Toggle password visibility">
+            <!-- Eye icon (visible state) -->
+            <svg id="eyeIcon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7
+                   -1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+            </svg>
+            <!-- Eye-off icon (hidden state) — shown when password is visible -->
+            <svg id="eyeOffIcon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="display:none">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M13.875 18.825A10.05 10.05 0 0112 19c-4.477 0-8.268-2.943-9.542-7
+                   a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243
+                   M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29
+                   M3 3l18 18"/>
+            </svg>
+          </button>
+        </div>
       </div>
 
       <button type="submit" class="btn btn-primary btn-full btn-lg" id="submitBtn">
@@ -86,6 +143,9 @@
 
     <p class="auth-footer">
       Don't have an account? <a href="signup.html">Sign up free</a>
+    </p>
+    <p class="auth-footer" style="margin-top:8px">
+      <a href="reset-password.html">Forgot password?</a>
     </p>
   </div>
 
@@ -99,11 +159,27 @@
     const alertBox  = document.getElementById('alertBox');
     const submitBtn = document.getElementById('submitBtn');
 
+    // ── Password show/hide toggle ─────────────────────────────────────
+    const pwInput    = document.getElementById('password');
+    const pwToggle   = document.getElementById('pwToggle');
+    const eyeIcon    = document.getElementById('eyeIcon');
+    const eyeOffIcon = document.getElementById('eyeOffIcon');
+
+    pwToggle.addEventListener('click', () => {
+      const isHidden = pwInput.type === 'password';
+      pwInput.type = isHidden ? 'text' : 'password';
+      eyeIcon.style.display    = isHidden ? 'none'  : '';
+      eyeOffIcon.style.display = isHidden ? ''      : 'none';
+      pwToggle.setAttribute('aria-label', isHidden ? 'Hide password' : 'Show password');
+    });
+
+    // ── Error helper ──────────────────────────────────────────────────
     function showError(msg) {
       alertBox.textContent = msg;
       alertBox.className = 'alert alert-error show';
     }
 
+    // ── Form submit ───────────────────────────────────────────────────
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
 
@@ -114,15 +190,11 @@
       submitBtn.innerHTML = '<span class="spinner"></span> Logging in…';
 
       try {
-        // API.login() calls POST /api/auth/login
-        // AND automatically saves the token + user_id to localStorage
         const result = await API.login(email, password);
 
         if (result.access_token) {
-          // ✅ Success — go to dashboard
           window.location.href = 'dashboard.html';
         } else {
-          // Backend returned { error: "..." }
           showError(result.error || 'Login failed. Check your credentials.');
         }
 

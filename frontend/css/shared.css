@@ -293,3 +293,58 @@ input, select, textarea, button { font-family: inherit; }
 @media (min-width: 769px) {
   .mobile-nav { display: none; }
 }
+
+/* ─── Password input wrapper (auth pages) ────────────────────────────── */
+.input-password-wrap { position: relative; }
+.input-password-wrap .form-input { padding-right: 44px; }
+
+/* ─── Skeleton loader (shared) ───────────────────────────────────────── */
+.skeleton {
+  background: linear-gradient(90deg, var(--gray-100) 25%, var(--gray-200) 50%, var(--gray-100) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite;
+  border-radius: 4px;
+  display: block;
+}
+@keyframes shimmer { to { background-position: -200% 0; } }
+
+/* ─── Additional mobile responsive fixes ────────────────────────────── */
+
+/* Ensure page wrapper handles small screens */
+@media (max-width: 768px) {
+  .page-wrapper { flex-direction: column; }
+  .main-content { padding: 16px; padding-bottom: 80px; }
+  .page-title { font-size: 1.3rem; }
+  .page-subtitle { font-size: 0.82rem; margin-bottom: 20px; }
+
+  /* Modal sizing on mobile */
+  .modal { padding: 20px 16px; max-height: 85vh; }
+  .modal-backdrop { padding: 8px; align-items: flex-end; }
+
+  /* Card grids collapse to single column */
+  .brands-grid { grid-template-columns: 1fr !important; }
+}
+
+@media (max-width: 480px) {
+  body { font-size: 0.9rem; }
+  .btn-lg { padding: 12px 20px; font-size: 0.9rem; }
+  .auth-card { padding: 24px 16px; margin: 8px; }
+
+  /* Stack button rows on very small screens */
+  .card-btn-row { flex-direction: column; }
+
+  /* Pills wrap and shrink */
+  .niche-pills { gap: 6px; }
+  .niche-pill { padding: 5px 12px; font-size: 0.74rem; }
+}
+
+/* Medium screens — tablet */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .sidebar { width: 200px; }
+  .main-content { padding: 24px 20px; }
+}
+
+/* Large screens */
+@media (min-width: 1280px) {
+  .main-content { padding: 36px 40px; }
+}

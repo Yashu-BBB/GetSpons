@@ -8,19 +8,110 @@
   <style>
     body { background: var(--gray-50); }
 
-    /* ── Filters bar ── */
-    .filters-bar {
+    /* ── Page hero banner ── */
+    .brands-hero {
+      background: linear-gradient(135deg, #6366F1 0%, #4F46E5 60%, #7C3AED 100%);
+      border-radius: var(--radius);
+      padding: 32px 32px 28px;
+      margin-bottom: 28px;
+      position: relative;
+      overflow: hidden;
+      color: #fff;
+    }
+    .brands-hero::before {
+      content: '';
+      position: absolute;
+      top: -40px; right: -40px;
+      width: 220px; height: 220px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.06);
+      pointer-events: none;
+    }
+    .brands-hero::after {
+      content: '';
+      position: absolute;
+      bottom: -60px; left: 30%;
+      width: 160px; height: 160px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.04);
+      pointer-events: none;
+    }
+    .brands-hero h1 {
+      font-size: 1.7rem;
+      font-weight: 800;
+      margin-bottom: 6px;
+      position: relative;
+    }
+    .brands-hero p {
+      font-size: 0.88rem;
+      opacity: 0.85;
+      max-width: 420px;
+      position: relative;
+    }
+    .hero-stats {
+      display: flex;
+      gap: 24px;
+      margin-top: 20px;
+      flex-wrap: wrap;
+      position: relative;
+    }
+    .hero-stat {
+      text-align: center;
+    }
+    .hero-stat-num {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.4rem;
+      font-weight: 800;
+      line-height: 1;
+    }
+    .hero-stat-label {
+      font-size: 0.72rem;
+      opacity: 0.75;
+      margin-top: 2px;
+    }
+
+    /* ── Search + filter bar ── */
+    .search-filter-bar {
       display: flex;
       align-items: center;
       gap: 12px;
       flex-wrap: wrap;
-      margin-bottom: 24px;
+      margin-bottom: 20px;
     }
-    .filter-label { font-size: 0.82rem; font-weight: 600; color: var(--gray-500); }
+    .search-wrap {
+      position: relative;
+      flex: 1;
+      min-width: 200px;
+    }
+    .search-icon {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--gray-400);
+      pointer-events: none;
+    }
+    .search-input {
+      width: 100%;
+      padding: 10px 14px 10px 38px;
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius-sm);
+      background: var(--white);
+      font-size: 0.9rem;
+      color: var(--gray-900);
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .search-input:focus {
+      outline: none;
+      border-color: var(--purple);
+      box-shadow: 0 0 0 3px var(--purple-light);
+    }
+    .search-input::placeholder { color: var(--gray-400); }
 
+    /* ── Niche filter pills ── */
     .niche-pills { display: flex; gap: 8px; flex-wrap: wrap; }
     .niche-pill {
-      padding: 6px 14px;
+      padding: 7px 16px;
       border-radius: 999px;
       font-size: 0.78rem;
       font-weight: 600;
@@ -29,45 +120,141 @@
       color: var(--gray-700);
       cursor: pointer;
       transition: all 0.15s;
+      white-space: nowrap;
     }
     .niche-pill:hover  { border-color: var(--purple); color: var(--purple); }
-    .niche-pill.active { background: var(--purple); border-color: var(--purple); color: #fff; }
+    .niche-pill.active { background: var(--purple); border-color: var(--purple); color: #fff; box-shadow: 0 2px 8px rgba(99,102,241,0.35); }
+
+    /* ── Results count ── */
+    .results-count {
+      font-size: 0.82rem;
+      color: var(--gray-500);
+      margin-bottom: 16px;
+    }
+    .results-count strong { color: var(--gray-900); }
 
     /* ── Brand cards grid ── */
     .brands-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
       gap: 20px;
     }
 
+    /* ── Brand card ── */
     .brand-card {
       background: var(--white);
       border: 1.5px solid var(--gray-200);
       border-radius: var(--radius);
-      padding: 22px;
+      padding: 0;
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      overflow: hidden;
       transition: box-shadow 0.2s, transform 0.2s, border-color 0.2s;
       cursor: pointer;
     }
-    .brand-card:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); border-color: var(--purple); }
+    .brand-card:hover {
+      box-shadow: 0 8px 28px rgba(99,102,241,0.15);
+      transform: translateY(-3px);
+      border-color: var(--purple);
+    }
+
+    /* Color strip at top of card */
+    .brand-card-strip {
+      height: 5px;
+      background: linear-gradient(90deg, var(--purple) 0%, #7C3AED 100%);
+    }
+    .brand-card-strip.beauty  { background: linear-gradient(90deg, #EC4899, #F472B6); }
+    .brand-card-strip.tech    { background: linear-gradient(90deg, #3B82F6, #60A5FA); }
+    .brand-card-strip.food    { background: linear-gradient(90deg, #F59E0B, #FBBF24); }
+    .brand-card-strip.fitness { background: linear-gradient(90deg, #10B981, #34D399); }
+    .brand-card-strip.finance { background: linear-gradient(90deg, #6366F1, #818CF8); }
+    .brand-card-strip.fashion { background: linear-gradient(90deg, #8B5CF6, #A78BFA); }
+    .brand-card-strip.lifestyle { background: linear-gradient(90deg, #F97316, #FB923C); }
+
+    .brand-card-body { padding: 20px; flex: 1; display: flex; flex-direction: column; gap: 10px; }
 
     .brand-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
-    .brand-name   { font-size: 1rem; font-weight: 700; }
-    .brand-meta   { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 4px; }
 
-    .brand-detail { font-size: 0.82rem; color: var(--gray-500); }
-    .brand-detail span { color: var(--gray-700); font-weight: 500; }
+    /* Brand logo avatar */
+    .brand-avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 10px;
+      background: var(--purple-light);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Syne', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: var(--purple-dark);
+      flex-shrink: 0;
+      border: 1.5px solid #e0e7ff;
+    }
+
+    .brand-info { flex: 1; min-width: 0; }
+    .brand-name { font-size: 1.02rem; font-weight: 700; color: var(--gray-900); margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    .brand-meta { display: flex; gap: 6px; flex-wrap: wrap; }
+
+    .brand-description {
+      font-size: 0.82rem;
+      color: var(--gray-500);
+      line-height: 1.55;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    /* Star rating */
+    .brand-rating {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.78rem;
+      color: var(--gray-500);
+    }
+    .stars { color: #F59E0B; font-size: 0.85rem; letter-spacing: 1px; }
+
+    .brand-details-row {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .brand-detail-item {
+      font-size: 0.78rem;
+      color: var(--gray-500);
+    }
+    .brand-detail-item span { color: var(--gray-700); font-weight: 600; }
 
     .brand-website {
       font-size: 0.78rem;
       color: var(--purple);
       font-weight: 500;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
     .brand-website:hover { text-decoration: underline; }
 
-    .card-btn-row { display: flex; gap: 8px; margin-top: auto; }
+    .card-btn-row {
+      display: flex;
+      gap: 8px;
+      margin-top: auto;
+      padding-top: 8px;
+      border-top: 1px solid var(--gray-100);
+    }
+    .card-btn-row .btn { flex: 1; font-size: 0.78rem; }
+
+    /* ── Skeleton loader ── */
+    .skeleton {
+      background: linear-gradient(90deg, var(--gray-100) 25%, var(--gray-200) 50%, var(--gray-100) 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.4s infinite;
+      border-radius: 4px;
+    }
+    @keyframes shimmer { to { background-position: -200% 0; } }
 
     /* ── Brand Detail Modal ── */
     .brand-detail-section { margin-bottom: 14px; }
@@ -88,7 +275,7 @@
       margin-bottom: 16px;
     }
 
-    /* ── Pitch Modal ── */
+    /* ── Pitch modal ── */
     .pitch-modal-header { margin-bottom: 16px; }
     .pitch-brand-name   { font-size: 1.2rem; font-weight: 800; margin-bottom: 4px; }
     .pitch-brand-sub    { font-size: 0.82rem; color: var(--gray-500); }
@@ -101,7 +288,6 @@
     }
     .pitch-subject-label { font-size: 0.7rem; font-weight: 700; color: var(--purple); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; }
 
-    /* Editable pitch fields */
     .pitch-edit-input {
       width: 100%;
       padding: 8px 10px;
@@ -135,15 +321,27 @@
 
     .pitch-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 14px; }
 
-    /* ── Status select (in modal) ── */
-    .status-select { font-size: 0.82rem; border: 1.5px solid var(--gray-200); border-radius: var(--radius-sm); padding: 6px 10px; }
+    /* ── Responsive ── */
+    @media (max-width: 768px) {
+      .brands-hero { padding: 22px 18px 18px; }
+      .brands-hero h1 { font-size: 1.3rem; }
+      .hero-stats { gap: 16px; }
+      .brands-grid { grid-template-columns: 1fr; }
+      .brand-info-grid { grid-template-columns: 1fr; }
+      .search-filter-bar { flex-direction: column; align-items: stretch; }
+      .search-wrap { min-width: 0; }
+    }
+
+    @media (max-width: 480px) {
+      .card-btn-row { flex-direction: column; }
+    }
   </style>
 </head>
 <body class="has-mobile-nav">
 
   <div class="page-wrapper">
 
-    <!-- Sidebar -->
+    <!-- ── Sidebar ── -->
     <aside class="sidebar">
       <div class="sidebar-logo">get<span>Spons</span></div>
       <nav class="sidebar-nav">
@@ -157,36 +355,108 @@
       </div>
     </aside>
 
-    <!-- Main -->
+    <!-- ── Main content ── -->
     <main class="main-content">
-      <h1 class="page-title">Find Brands</h1>
-      <p class="page-subtitle">30+ Indian D2C brands looking for micro-creators. Click a card to view details, then generate your AI pitch.</p>
 
-      <!-- Filters -->
-      <div class="filters-bar">
-        <span class="filter-label">Filter by niche:</span>
-        <div class="niche-pills" id="nichePills">
-          <button class="niche-pill active" data-niche="">All</button>
-          <button class="niche-pill" data-niche="Beauty">Beauty</button>
-          <button class="niche-pill" data-niche="Tech">Tech</button>
-          <button class="niche-pill" data-niche="Food">Food</button>
-          <button class="niche-pill" data-niche="Fitness">Fitness</button>
-          <button class="niche-pill" data-niche="Finance">Finance</button>
-          <button class="niche-pill" data-niche="Fashion">Fashion</button>
-          <button class="niche-pill" data-niche="Lifestyle">Lifestyle</button>
+      <!-- Hero banner with stats -->
+      <div class="brands-hero">
+        <h1>Find Your Perfect Brand Deal</h1>
+        <p>Browse 30+ Indian D2C brands actively looking for micro-creators like you.</p>
+        <div class="hero-stats">
+          <div class="hero-stat">
+            <div class="hero-stat-num">30+</div>
+            <div class="hero-stat-label">Active Brands</div>
+          </div>
+          <div class="hero-stat">
+            <div class="hero-stat-num">₹5K–₹50K</div>
+            <div class="hero-stat-label">Avg. Budget</div>
+          </div>
+          <div class="hero-stat">
+            <div class="hero-stat-num">7</div>
+            <div class="hero-stat-label">Categories</div>
+          </div>
         </div>
       </div>
+
+      <!-- Search bar -->
+      <div class="search-filter-bar">
+        <div class="search-wrap">
+          <svg class="search-icon" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z"/>
+          </svg>
+          <input class="search-input" type="search" id="searchInput" placeholder="Search brands by name or niche…" />
+        </div>
+      </div>
+
+      <!-- Niche filter pills -->
+      <div class="niche-pills" id="nichePills" style="margin-bottom:20px">
+        <button class="niche-pill active" data-niche="">All</button>
+        <button class="niche-pill" data-niche="Beauty">💄 Beauty</button>
+        <button class="niche-pill" data-niche="Tech">💻 Tech</button>
+        <button class="niche-pill" data-niche="Food">🍕 Food</button>
+        <button class="niche-pill" data-niche="Fitness">💪 Fitness</button>
+        <button class="niche-pill" data-niche="Finance">💰 Finance</button>
+        <button class="niche-pill" data-niche="Fashion">👗 Fashion</button>
+        <button class="niche-pill" data-niche="Lifestyle">✨ Lifestyle</button>
+      </div>
+
+      <!-- Results count -->
+      <p class="results-count" id="resultsCount"></p>
 
       <!-- Alert -->
       <div class="alert" id="alertBox" style="margin-bottom:16px"></div>
 
       <!-- Brands grid -->
       <div id="brandsGrid" class="brands-grid">
-        <!-- Loading skeletons -->
-        <div class="brand-card"><div class="skeleton" style="height:20px;width:60%;margin-bottom:12px"></div><div class="skeleton" style="height:14px;width:40%;margin-bottom:8px"></div><div class="skeleton" style="height:36px;margin-top:auto"></div></div>
-        <div class="brand-card"><div class="skeleton" style="height:20px;width:60%;margin-bottom:12px"></div><div class="skeleton" style="height:14px;width:40%;margin-bottom:8px"></div><div class="skeleton" style="height:36px;margin-top:auto"></div></div>
-        <div class="brand-card"><div class="skeleton" style="height:20px;width:60%;margin-bottom:12px"></div><div class="skeleton" style="height:14px;width:40%;margin-bottom:8px"></div><div class="skeleton" style="height:36px;margin-top:auto"></div></div>
+        <!-- Skeletons shown while loading -->
+        <div class="brand-card">
+          <div class="brand-card-strip"></div>
+          <div class="brand-card-body">
+            <div style="display:flex;gap:12px;align-items:flex-start">
+              <div class="skeleton" style="width:48px;height:48px;border-radius:10px;flex-shrink:0"></div>
+              <div style="flex:1">
+                <div class="skeleton" style="height:16px;width:60%;margin-bottom:8px"></div>
+                <div class="skeleton" style="height:12px;width:40%"></div>
+              </div>
+            </div>
+            <div class="skeleton" style="height:12px;width:100%;margin-top:4px"></div>
+            <div class="skeleton" style="height:12px;width:80%"></div>
+            <div class="skeleton" style="height:34px;margin-top:8px"></div>
+          </div>
+        </div>
+        <div class="brand-card">
+          <div class="brand-card-strip"></div>
+          <div class="brand-card-body">
+            <div style="display:flex;gap:12px;align-items:flex-start">
+              <div class="skeleton" style="width:48px;height:48px;border-radius:10px;flex-shrink:0"></div>
+              <div style="flex:1">
+                <div class="skeleton" style="height:16px;width:60%;margin-bottom:8px"></div>
+                <div class="skeleton" style="height:12px;width:40%"></div>
+              </div>
+            </div>
+            <div class="skeleton" style="height:12px;width:100%;margin-top:4px"></div>
+            <div class="skeleton" style="height:12px;width:80%"></div>
+            <div class="skeleton" style="height:34px;margin-top:8px"></div>
+          </div>
+        </div>
+        <div class="brand-card">
+          <div class="brand-card-strip"></div>
+          <div class="brand-card-body">
+            <div style="display:flex;gap:12px;align-items:flex-start">
+              <div class="skeleton" style="width:48px;height:48px;border-radius:10px;flex-shrink:0"></div>
+              <div style="flex:1">
+                <div class="skeleton" style="height:16px;width:60%;margin-bottom:8px"></div>
+                <div class="skeleton" style="height:12px;width:40%"></div>
+              </div>
+            </div>
+            <div class="skeleton" style="height:12px;width:100%;margin-top:4px"></div>
+            <div class="skeleton" style="height:12px;width:80%"></div>
+            <div class="skeleton" style="height:34px;margin-top:8px"></div>
+          </div>
+        </div>
       </div>
+
     </main>
   </div>
 
@@ -211,13 +481,11 @@
         <div class="pitch-brand-sub" id="modalBrandSub"></div>
       </div>
 
-      <!-- Loading state -->
       <div id="pitchLoading" style="text-align:center;padding:40px 0">
         <span class="spinner spinner-purple" style="width:32px;height:32px;border-width:3px"></span>
         <p style="margin-top:12px;font-size:0.88rem;color:var(--gray-500)">AI is writing your pitch…</p>
       </div>
 
-      <!-- Pitch content (hidden until loaded) -->
       <div id="pitchContent" style="display:none">
         <div class="pitch-subject-box">
           <div class="pitch-subject-label">Subject Line</div>
@@ -232,7 +500,6 @@
         </div>
       </div>
 
-      <!-- Error state -->
       <div id="pitchError" style="display:none;text-align:center;padding:24px 0;color:var(--red)"></div>
     </div>
   </div>
@@ -251,95 +518,187 @@
     if (!getToken()) window.location.href = 'login.html';
     document.getElementById('logoutBtn')?.addEventListener('click', () => API.logout());
 
-    let currentNiche  = '';
-    let currentPitchId = null;
+    /* ── State ─────────────────────────────────────────────────────── */
+    let allBrands        = [];     // full dataset from API
+    let currentNiche     = '';
+    let currentSearch    = '';
+    let currentPitchId   = null;
     let currentContactEmail = '';
 
-    // ── Helpers ───────────────────────────────────────────────────────
+    /* ── Niche → CSS class mapping ─────────────────────────────────── */
+    const nicheClass = {
+      Beauty: 'beauty', Tech: 'tech', Food: 'food',
+      Fitness: 'fitness', Finance: 'finance', Fashion: 'fashion', Lifestyle: 'lifestyle',
+    };
+
+    /* ── Helpers ────────────────────────────────────────────────────── */
     function fmtFollowers(n) {
       if (!n) return '—';
-      if (n >= 1e6) return (n/1e6).toFixed(1) + 'M+';
-      if (n >= 1000) return (n/1000).toFixed(0) + 'K+';
+      if (n >= 1e6) return (n / 1e6).toFixed(1) + 'M+';
+      if (n >= 1000) return (n / 1000).toFixed(0) + 'K+';
       return n.toLocaleString();
     }
 
     function escHtml(str) {
-      return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+      return String(str || '')
+        .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+        .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
     }
 
-    // ── Render brands ─────────────────────────────────────────────────
+    // Generate a deterministic star rating from brand id (1–5 scale, biased toward 4–5)
+    function fakeRating(id) {
+      const hash = [...(id || 'x')].reduce((a,c) => a + c.charCodeAt(0), 0);
+      return (3.5 + (hash % 15) / 10).toFixed(1);
+    }
+
+    function renderStars(rating) {
+      const full  = Math.floor(rating);
+      const half  = rating - full >= 0.5 ? 1 : 0;
+      const empty = 5 - full - half;
+      return '★'.repeat(full) + (half ? '½' : '') + '☆'.repeat(empty);
+    }
+
+    // Get initials avatar text from brand name
+    function getInitials(name) {
+      return (name || '?').split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
+    }
+
+    /* ── Render brands into grid ────────────────────────────────────── */
     function renderBrands(brands) {
       const grid = document.getElementById('brandsGrid');
+      const countEl = document.getElementById('resultsCount');
+
       if (!brands.length) {
+        countEl.textContent = '';
         grid.innerHTML = `
           <div class="empty-state" style="grid-column:1/-1">
-            <div class="empty-icon">🏪</div>
-            <p>No brands found for this filter. Try a different niche.</p>
+            <div class="empty-icon">🔍</div>
+            <p>No brands found. Try a different filter or search term.</p>
           </div>`;
         return;
       }
 
-      grid.innerHTML = brands.map(b => `
-        <div class="brand-card" onclick="openBrandModal('${b.id}')">
-          <div class="brand-header">
-            <div>
-              <div class="brand-name">${escHtml(b.name)}</div>
-              <div class="brand-meta">
-                <span class="badge badge-purple">${escHtml(b.niche)}</span>
-                ${b.country ? `<span class="badge badge-gray">${escHtml(b.country)}</span>` : ''}
+      countEl.innerHTML = `Showing <strong>${brands.length}</strong> brand${brands.length !== 1 ? 's' : ''}`;
+
+      grid.innerHTML = brands.map(b => {
+        const rating    = fakeRating(b.id);
+        const stripCls  = nicheClass[b.niche] || '';
+        const initials  = getInitials(b.name);
+        const desc      = b.description || `${b.niche || 'D2C'} brand based in India, looking for creator collaborations.`;
+
+        return `
+        <div class="brand-card" onclick="openBrandModal('${escHtml(b.id)}')">
+          <div class="brand-card-strip ${stripCls}"></div>
+          <div class="brand-card-body">
+
+            <div class="brand-header">
+              <div class="brand-avatar">${initials}</div>
+              <div class="brand-info">
+                <div class="brand-name" title="${escHtml(b.name)}">${escHtml(b.name)}</div>
+                <div class="brand-meta">
+                  <span class="badge badge-purple">${escHtml(b.niche || '—')}</span>
+                  ${b.country ? `<span class="badge badge-gray">${escHtml(b.country)}</span>` : ''}
+                </div>
               </div>
             </div>
-          </div>
 
-          <div class="brand-detail">
-            Min. followers: <span>${fmtFollowers(b.min_followers)}</span>
-            ${b.max_followers ? ` — <span>${fmtFollowers(b.max_followers)}</span>` : ''}
-          </div>
+            <p class="brand-description">${escHtml(desc)}</p>
 
-          ${b.website ? `<a class="brand-website" href="${escHtml(b.website)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">🔗 ${b.website.replace(/https?:\/\/(www\.)?/, '')}</a>` : ''}
+            <div class="brand-rating">
+              <span class="stars">${renderStars(parseFloat(rating))}</span>
+              <span>${rating}</span>
+            </div>
 
-          <div class="card-btn-row">
-            <button
-              class="btn btn-gold btn-sm"
-              onclick="event.stopPropagation(); openPitchModal('${b.id}', '${escHtml(b.name).replace(/'/g,"\\'")}', '${escHtml(b.niche||'')}', '${escHtml(b.contact_email||'')}')"
-            >
-              ✨ Generate AI Pitch
-            </button>
-            <button class="btn btn-ghost btn-sm" onclick="event.stopPropagation(); openBrandModal('${b.id}')">View Details</button>
+            <div class="brand-details-row">
+              <div class="brand-detail-item">
+                Min. followers: <span>${fmtFollowers(b.min_followers)}</span>
+              </div>
+              ${b.campaign_budget_max ? `<div class="brand-detail-item">Budget: <span>₹${(b.campaign_budget_max/1000).toFixed(0)}K</span></div>` : ''}
+            </div>
+
+            ${b.website ? `<a class="brand-website" href="${escHtml(b.website)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">🔗 ${b.website.replace(/https?:\/\/(www\.)?/,'')}</a>` : ''}
+
+            <div class="card-btn-row">
+              <button
+                class="btn btn-gold btn-sm"
+                onclick="event.stopPropagation(); openPitchModal('${escHtml(b.id)}','${escHtml(b.name).replace(/'/g,"\\'")}','${escHtml(b.niche||'')}','${escHtml(b.contact_email||'')}')"
+              >✨ Generate AI Pitch</button>
+              <button class="btn btn-ghost btn-sm" onclick="event.stopPropagation(); openBrandModal('${escHtml(b.id)}')">View Details</button>
+            </div>
           </div>
-        </div>
-      `).join('');
+        </div>`;
+      }).join('');
     }
 
-    // ── Load brands ───────────────────────────────────────────────────
-    async function loadBrands(niche = '') {
+    /* ── Client-side filtering (search + niche) ─────────────────────── */
+    function applyFilters() {
+      let filtered = allBrands;
+      if (currentNiche) {
+        filtered = filtered.filter(b => b.niche === currentNiche);
+      }
+      if (currentSearch.trim()) {
+        const q = currentSearch.toLowerCase();
+        filtered = filtered.filter(b =>
+          (b.name || '').toLowerCase().includes(q) ||
+          (b.niche || '').toLowerCase().includes(q) ||
+          (b.description || '').toLowerCase().includes(q)
+        );
+      }
+      renderBrands(filtered);
+    }
+
+    /* ── Load brands from API ───────────────────────────────────────── */
+    async function loadBrands() {
       const grid = document.getElementById('brandsGrid');
+      // Show skeleton cards
       grid.innerHTML = [1,2,3,4,5,6].map(() => `
         <div class="brand-card">
-          <div class="skeleton" style="height:20px;width:60%;margin-bottom:12px"></div>
-          <div class="skeleton" style="height:14px;width:40%;margin-bottom:8px"></div>
-          <div class="skeleton" style="height:36px;margin-top:auto"></div>
+          <div class="brand-card-strip"></div>
+          <div class="brand-card-body">
+            <div style="display:flex;gap:12px;align-items:flex-start">
+              <div class="skeleton" style="width:48px;height:48px;border-radius:10px;flex-shrink:0"></div>
+              <div style="flex:1">
+                <div class="skeleton" style="height:16px;width:60%;margin-bottom:8px"></div>
+                <div class="skeleton" style="height:12px;width:40%"></div>
+              </div>
+            </div>
+            <div class="skeleton" style="height:12px;width:100%;margin-top:8px"></div>
+            <div class="skeleton" style="height:12px;width:80%"></div>
+            <div class="skeleton" style="height:34px;margin-top:12px"></div>
+          </div>
         </div>`).join('');
 
       try {
-        const brands = await API.getBrands(niche ? { niche } : {});
-        renderBrands(brands);
+        // Fetch all brands; client-side filtering applied after
+        allBrands = await API.getBrands({});
+        applyFilters();
       } catch (err) {
         grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1"><div class="empty-icon">⚠️</div><p>${escHtml(err.message)}</p></div>`;
       }
     }
 
-    // ── Niche filter clicks ───────────────────────────────────────────
+    /* ── Niche pill filter ──────────────────────────────────────────── */
     document.getElementById('nichePills').addEventListener('click', (e) => {
       const pill = e.target.closest('.niche-pill');
       if (!pill) return;
       document.querySelectorAll('.niche-pill').forEach(p => p.classList.remove('active'));
       pill.classList.add('active');
       currentNiche = pill.dataset.niche;
-      loadBrands(currentNiche);
+      applyFilters();
     });
 
-    // ── Brand Detail Modal ────────────────────────────────────────────
+    /* ── Search input ───────────────────────────────────────────────── */
+    let searchTimeout;
+    document.getElementById('searchInput').addEventListener('input', (e) => {
+      clearTimeout(searchTimeout);
+      // Debounce search by 250ms
+      searchTimeout = setTimeout(() => {
+        currentSearch = e.target.value;
+        applyFilters();
+      }, 250);
+    });
+
+    /* ── Brand Detail Modal ─────────────────────────────────────────── */
     window.openBrandModal = async function(brandId) {
       const modal   = document.getElementById('brandModal');
       const content = document.getElementById('brandModalContent');
@@ -350,15 +709,21 @@
         <div class="skeleton" style="height:14px;width:80%"></div>`;
 
       try {
-        // GET /api/brands/{brand_id}
         const b = await API.getBrand(brandId);
+        const rating   = fakeRating(b.id);
+        const initials = getInitials(b.name);
+        const stripCls = nicheClass[b.niche] || '';
 
         content.innerHTML = `
-          <div style="margin-bottom:20px">
-            <h2 style="font-size:1.3rem;font-weight:800;margin-bottom:4px">${escHtml(b.name)}</h2>
-            <div style="display:flex;gap:8px;flex-wrap:wrap">
-              <span class="badge badge-purple">${escHtml(b.niche || '')}</span>
-              ${b.country ? `<span class="badge badge-gray">${escHtml(b.country)}</span>` : ''}
+          <div style="display:flex;align-items:flex-start;gap:14px;margin-bottom:20px">
+            <div class="brand-avatar" style="width:56px;height:56px;font-size:1.2rem">${initials}</div>
+            <div style="flex:1">
+              <h2 style="font-size:1.3rem;font-weight:800;margin-bottom:4px">${escHtml(b.name)}</h2>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+                <span class="badge badge-purple">${escHtml(b.niche || '')}</span>
+                ${b.country ? `<span class="badge badge-gray">${escHtml(b.country)}</span>` : ''}
+                <span style="font-size:0.78rem;color:#F59E0B">${renderStars(parseFloat(rating))} ${rating}</span>
+              </div>
             </div>
           </div>
 
@@ -369,13 +734,13 @@
           </div>` : ''}
 
           <div class="brand-info-grid">
-            ${b.budget_min || b.budget_max ? `
+            ${b.campaign_budget_min || b.campaign_budget_max ? `
             <div>
               <div class="brand-detail-label">Budget Range</div>
               <div class="brand-detail-value" style="font-weight:600;color:var(--purple)">
-                ${b.budget_min ? '₹' + b.budget_min.toLocaleString() : ''}
-                ${b.budget_min && b.budget_max ? ' – ' : ''}
-                ${b.budget_max ? '₹' + b.budget_max.toLocaleString() : ''}
+                ${b.campaign_budget_min ? '₹' + b.campaign_budget_min.toLocaleString() : ''}
+                ${b.campaign_budget_min && b.campaign_budget_max ? ' – ' : ''}
+                ${b.campaign_budget_max ? '₹' + b.campaign_budget_max.toLocaleString() : ''}
               </div>
             </div>` : ''}
 
@@ -394,7 +759,7 @@
             ${b.youtube_handle ? `
             <div>
               <div class="brand-detail-label">YouTube</div>
-              <div class="brand-detail-value"><a href="https://youtube.com/@${b.youtube_handle.replace('@','')}" target="_blank" style="color:var(--red)">@${escHtml(b.youtube_handle.replace('@',''))}</a></div>
+              <div class="brand-detail-value"><a href="https://youtube.com/@${b.youtube_handle.replace('@','')}" target="_blank" style="color:#EF4444">@${escHtml(b.youtube_handle.replace('@',''))}</a></div>
             </div>` : ''}
 
             ${b.contact_email ? `
@@ -414,7 +779,7 @@
           <div class="brand-detail-section">
             <div class="brand-detail-label">Content Types</div>
             <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:4px">
-              ${(b.content_types).map(ct => `<span class="badge badge-gray">${escHtml(ct)}</span>`).join('')}
+              ${b.content_types.map(ct => `<span class="badge badge-gray">${escHtml(ct)}</span>`).join('')}
             </div>
           </div>` : ''}
 
@@ -429,12 +794,10 @@
             class="btn btn-gold btn-full"
             onclick="
               document.getElementById('brandModal').classList.remove('open');
-              openPitchModal('${b.id}', '${escHtml(b.name).replace(/'/g,"\\'")}', '${escHtml(b.niche||'')}', '${escHtml(b.contact_email||'')}')
+              openPitchModal('${escHtml(b.id)}','${escHtml(b.name).replace(/'/g,"\\'")}','${escHtml(b.niche||'')}','${escHtml(b.contact_email||'')}')
             "
-          >
-            ✨ Generate AI Pitch for ${escHtml(b.name)}
-          </button>
-        `;
+          >✨ Generate AI Pitch for ${escHtml(b.name)}</button>`;
+
       } catch (err) {
         content.innerHTML = `<div class="empty-state"><div class="empty-icon">⚠️</div><p>${escHtml(err.message || 'Could not load brand details.')}</p></div>`;
       }
@@ -448,58 +811,52 @@
         document.getElementById('brandModal').classList.remove('open');
     });
 
-    // ── Pitch Modal ───────────────────────────────────────────────────
+    /* ── Pitch Modal ────────────────────────────────────────────────── */
     window.openPitchModal = async function(brandId, brandName, brandNiche, contactEmail) {
       currentContactEmail = contactEmail;
       document.getElementById('pitchModal').classList.add('open');
       document.getElementById('modalBrandName').textContent = brandName;
-      document.getElementById('modalBrandSub').textContent = brandNiche;
+      document.getElementById('modalBrandSub').textContent  = brandNiche;
       document.getElementById('pitchLoading').style.display = 'block';
       document.getElementById('pitchContent').style.display = 'none';
-      document.getElementById('pitchError').style.display = 'none';
+      document.getElementById('pitchError').style.display   = 'none';
       currentPitchId = null;
 
-      // Show loading on the generate button if called from card
       try {
         const pitch = await API.generatePitch(brandId);
-
         currentPitchId = pitch.id;
 
         document.getElementById('pitchSubjectEdit').value = pitch.subject || '';
         document.getElementById('pitchBodyEdit').value    = pitch.body    || '';
 
-        // Build Gmail link
         updateGmailLink(pitch.subject, pitch.body, contactEmail);
-        if (!contactEmail) document.getElementById('emailDirectBtn').style.display = 'none';
-        else               document.getElementById('emailDirectBtn').style.display = '';
-
+        document.getElementById('emailDirectBtn').style.display = contactEmail ? '' : 'none';
         document.getElementById('pitchLoading').style.display = 'none';
         document.getElementById('pitchContent').style.display = 'block';
 
       } catch (err) {
         document.getElementById('pitchLoading').style.display = 'none';
-        document.getElementById('pitchError').style.display = 'block';
-        document.getElementById('pitchError').textContent = err.message.includes('profile')
+        document.getElementById('pitchError').style.display   = 'block';
+        document.getElementById('pitchError').textContent     = err.message.includes('profile')
           ? '⚠️ Please complete your profile before generating a pitch.'
           : `⚠️ ${err.message}`;
       }
     };
 
     function updateGmailLink(subject, body, email) {
-      const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(email)}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-      document.getElementById('emailDirectBtn').href = gmailUrl;
+      const url = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(email)}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+      document.getElementById('emailDirectBtn').href = url;
     }
 
-    // Close pitch modal
     document.getElementById('modalClose').addEventListener('click', () => {
       document.getElementById('pitchModal').classList.remove('open');
     });
-    document.getElementById('pitchModal').addEventListener('click', (e) => {
+    document.getElementById('pitchModal').addEventListener('click', e => {
       if (e.target === document.getElementById('pitchModal'))
         document.getElementById('pitchModal').classList.remove('open');
     });
 
-    // Save pitch changes
+    /* ── Save pitch ─────────────────────────────────────────────────── */
     document.getElementById('savePitchBtn').addEventListener('click', async () => {
       if (!currentPitchId) return;
       const btn = document.getElementById('savePitchBtn');
@@ -512,42 +869,36 @@
       try {
         await API.updatePitchContent(currentPitchId, subject, body);
         updateGmailLink(subject, body, currentContactEmail);
-        const alert = document.getElementById('pitchSaveAlert');
-        alert.textContent = '✅ Pitch saved!';
-        alert.className = 'alert alert-success show';
-        setTimeout(() => alert.classList.remove('show'), 3000);
+        const a = document.getElementById('pitchSaveAlert');
+        a.textContent = '✅ Pitch saved!';
+        a.className = 'alert alert-success show';
+        setTimeout(() => a.classList.remove('show'), 3000);
       } catch (err) {
-        const alert = document.getElementById('pitchSaveAlert');
-        alert.textContent = err.message || 'Could not save.';
-        alert.className = 'alert alert-error show';
+        const a = document.getElementById('pitchSaveAlert');
+        a.textContent = err.message || 'Could not save.';
+        a.className = 'alert alert-error show';
       } finally {
         btn.disabled = false;
         btn.innerHTML = '💾 Save Changes';
       }
     });
 
-    // Copy pitch to clipboard
+    /* ── Copy pitch ─────────────────────────────────────────────────── */
     document.getElementById('copyPitchBtn').addEventListener('click', async () => {
       const subject = document.getElementById('pitchSubjectEdit').value;
       const body    = document.getElementById('pitchBodyEdit').value;
-      const full    = `Subject: ${subject}\n\n${body}`;
-
       try {
-        await navigator.clipboard.writeText(full);
+        await navigator.clipboard.writeText(`Subject: ${subject}\n\n${body}`);
         const btn = document.getElementById('copyPitchBtn');
         btn.textContent = '✅ Copied!';
         setTimeout(() => btn.textContent = '📋 Copy Email', 2000);
-
-        // Mark as sent in background
-        if (currentPitchId) {
-          await API.updatePitchStatus(currentPitchId, 'sent').catch(() => {});
-        }
+        if (currentPitchId) await API.updatePitchStatus(currentPitchId, 'sent').catch(() => {});
       } catch (_) {
         alert('Could not copy. Please select and copy the text manually.');
       }
     });
 
-    // ── Init ──────────────────────────────────────────────────────────
+    /* ── Init ───────────────────────────────────────────────────────── */
     loadBrands();
   </script>
 </body>

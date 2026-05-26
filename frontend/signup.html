@@ -3,40 +3,186 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Sign Up — getSpons</title>
+  <title>Create Account — getSpons</title>
   <link rel="stylesheet" href="css/shared.css" />
   <style>
-    body { background: var(--gray-50); display: flex; align-items: center; justify-content: center; min-height: 100vh; }
-
-    .auth-card {
-      background: var(--white);
-      border: 1px solid var(--gray-200);
-      border-radius: var(--radius);
-      padding: 40px 36px;
-      width: 100%;
-      max-width: 420px;
-      box-shadow: var(--shadow-md);
+    body {
+      background: linear-gradient(135deg, #f0f0ff 0%, #fafafa 50%, #fffbf0 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 16px;
     }
 
+    /* ── Signup card — wider for premium feel ── */
+    .signup-card {
+      background: var(--white);
+      border: 1px solid var(--gray-200);
+      border-radius: 16px;
+      padding: 48px 44px;
+      width: 100%;
+      max-width: 460px;
+      box-shadow: 0 8px 40px rgba(99,102,241,0.12);
+      animation: fadeUp 0.35s ease;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── Logo ── */
     .auth-logo {
       font-family: 'Syne', sans-serif;
-      font-size: 1.5rem;
+      font-size: 1.6rem;
       font-weight: 800;
       color: var(--purple);
       text-align: center;
-      margin-bottom: 6px;
+      margin-bottom: 4px;
     }
     .auth-logo span { color: var(--gold); }
 
-    .auth-tagline {
+    /* ── Heading ── */
+    .signup-heading {
       text-align: center;
-      font-size: 0.88rem;
+      font-family: 'Syne', sans-serif;
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: var(--gray-900);
+      margin-bottom: 4px;
+    }
+    .signup-subtext {
+      text-align: center;
+      font-size: 0.85rem;
       color: var(--gray-500);
-      margin-bottom: 28px;
+      margin-bottom: 32px;
     }
 
-    .auth-form { display: flex; flex-direction: column; gap: 16px; }
+    /* ── Onboarding steps ── */
+    .onboarding-steps {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      margin-bottom: 28px;
+    }
+    .step {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.72rem;
+      color: var(--gray-400);
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .step.active { color: var(--purple); }
+    .step-num {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: var(--gray-200);
+      color: var(--gray-500);
+      font-size: 0.68rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .step.active .step-num {
+      background: var(--purple);
+      color: #fff;
+      box-shadow: 0 2px 8px rgba(99,102,241,0.4);
+    }
+    .step-sep {
+      width: 20px;
+      height: 1.5px;
+      background: var(--gray-200);
+      flex-shrink: 0;
+    }
 
+    /* ── Form ── */
+    .signup-form { display: flex; flex-direction: column; gap: 18px; }
+
+    /* ── Divider with "or" ── */
+    .auth-divider {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 4px 0;
+      color: var(--gray-400);
+      font-size: 0.78rem;
+    }
+    .auth-divider::before,
+    .auth-divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--gray-200);
+    }
+
+    /* ── Password input wrapper ── */
+    .input-password-wrap { position: relative; }
+    .input-password-wrap .form-input { padding-right: 44px; }
+    .password-toggle {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--gray-400);
+      padding: 4px;
+      display: flex;
+      align-items: center;
+      transition: color 0.15s;
+    }
+    .password-toggle:hover { color: var(--purple); }
+    .password-toggle svg { width: 18px; height: 18px; }
+
+    /* ── Strength indicator ── */
+    .pw-strength {
+      display: flex;
+      gap: 4px;
+      margin-top: 6px;
+    }
+    .pw-strength-bar {
+      height: 3px;
+      flex: 1;
+      border-radius: 2px;
+      background: var(--gray-200);
+      transition: background 0.25s;
+    }
+    .pw-strength-bar.weak   { background: var(--red); }
+    .pw-strength-bar.medium { background: var(--gold); }
+    .pw-strength-bar.strong { background: var(--green); }
+    .pw-strength-label {
+      font-size: 0.72rem;
+      color: var(--gray-500);
+      margin-top: 4px;
+    }
+
+    /* ── Submit button ── */
+    .btn-signup {
+      background: linear-gradient(135deg, var(--purple) 0%, var(--purple-dark) 100%);
+      color: #fff;
+      border: none;
+      padding: 14px 24px;
+      border-radius: var(--radius-sm);
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+      box-shadow: 0 4px 14px rgba(99,102,241,0.3);
+      width: 100%;
+    }
+    .btn-signup:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(99,102,241,0.4); }
+    .btn-signup:active { transform: none; }
+    .btn-signup:disabled { opacity: 0.6; cursor: not-allowed; transform: none; box-shadow: none; }
+
+    /* ── Footer ── */
     .auth-footer {
       margin-top: 20px;
       text-align: center;
@@ -45,55 +191,41 @@
     }
     .auth-footer a { color: var(--purple); font-weight: 600; }
 
-    /* Onboarding steps indicator */
-    .onboarding-steps {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      margin-bottom: 24px;
+    /* ── Terms text ── */
+    .terms-note {
+      font-size: 0.74rem;
+      color: var(--gray-400);
+      text-align: center;
     }
-    .step {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 0.75rem;
-      color: var(--gray-300);
-      font-weight: 600;
+    .terms-note a { color: var(--purple); }
+
+    /* ── Responsive ── */
+    @media (max-width: 520px) {
+      .signup-card { padding: 32px 20px; }
+      .signup-heading { font-size: 1.15rem; }
     }
-    .step.active { color: var(--purple); }
-    .step.done   { color: var(--green); }
-    .step-num {
-      width: 22px;
-      height: 22px;
-      border-radius: 50%;
-      background: var(--gray-200);
-      color: var(--gray-500);
-      font-size: 0.7rem;
-      font-weight: 700;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .step.active .step-num { background: var(--purple); color: #fff; }
-    .step-sep { width: 24px; height: 1.5px; background: var(--gray-200); }
   </style>
 </head>
 <body>
-  <div class="auth-card">
-    <div class="auth-logo">get<span>Spons</span></div>
-    <p class="auth-tagline">Create your free creator account</p>
+  <div class="signup-card">
 
-    <!-- Onboarding progress indicator -->
+    <!-- Logo -->
+    <div class="auth-logo">get<span>Spons</span></div>
+
+    <!-- Heading -->
+    <h1 class="signup-heading">Create your account</h1>
+    <p class="signup-subtext">Join 1,200+ creators already landing brand deals</p>
+
+    <!-- Onboarding progress: step 1 active -->
     <div class="onboarding-steps">
       <div class="step active">
         <div class="step-num">1</div>
-        Create Account
+        Account
       </div>
       <div class="step-sep"></div>
       <div class="step">
         <div class="step-num">2</div>
-        Your Profile
+        Profile
       </div>
       <div class="step-sep"></div>
       <div class="step">
@@ -102,11 +234,12 @@
       </div>
     </div>
 
-    <!-- Error / Success messages -->
+    <!-- Alert box for errors/success -->
     <div class="alert" id="alertBox"></div>
 
-    <form class="auth-form" id="signupForm">
+    <form class="signup-form" id="signupForm">
 
+      <!-- Email -->
       <div class="form-group">
         <label class="form-label" for="email">Email address</label>
         <input
@@ -119,22 +252,53 @@
         />
       </div>
 
+      <!-- Password with toggle + strength meter -->
       <div class="form-group">
         <label class="form-label" for="password">Password</label>
-        <input
-          class="form-input"
-          type="password"
-          id="password"
-          placeholder="At least 6 characters"
-          minlength="6"
-          required
-          autocomplete="new-password"
-        />
+        <div class="input-password-wrap">
+          <input
+            class="form-input"
+            type="password"
+            id="password"
+            placeholder="At least 6 characters"
+            minlength="6"
+            required
+            autocomplete="new-password"
+          />
+          <button type="button" class="password-toggle" id="pwToggle" aria-label="Show password">
+            <svg id="eyeIcon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7
+                   -1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+            </svg>
+            <svg id="eyeOffIcon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="display:none">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M13.875 18.825A10.05 10.05 0 0112 19c-4.477 0-8.268-2.943-9.542-7
+                   a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243
+                   M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29
+                   M3 3l18 18"/>
+            </svg>
+          </button>
+        </div>
+        <!-- Live password strength meter -->
+        <div class="pw-strength" id="pwStrengthBars">
+          <div class="pw-strength-bar" id="bar1"></div>
+          <div class="pw-strength-bar" id="bar2"></div>
+          <div class="pw-strength-bar" id="bar3"></div>
+        </div>
+        <div class="pw-strength-label" id="pwStrengthLabel"></div>
       </div>
 
-      <button type="submit" class="btn btn-primary btn-full btn-lg" id="submitBtn">
-        Create account
+      <!-- Submit -->
+      <button type="submit" class="btn-signup" id="submitBtn">
+        Create Free Account →
       </button>
+
+      <p class="terms-note">
+        By signing up you agree to our <a href="#">Terms</a> &amp; <a href="#">Privacy Policy</a>
+      </p>
     </form>
 
     <p class="auth-footer">
@@ -143,16 +307,60 @@
   </div>
 
   <script type="module">
-    import { API, getToken, saveToken, saveUserId } from './js/api.js';
+    import { API, getToken } from './js/api.js';
 
-    // If user is already logged in, redirect to dashboard
+    // Already logged in → redirect
     if (getToken()) window.location.href = 'dashboard.html';
 
     const form      = document.getElementById('signupForm');
     const alertBox  = document.getElementById('alertBox');
     const submitBtn = document.getElementById('submitBtn');
 
-    // ── Show / hide messages ──────────────────────────────────────────
+    // ── Password show/hide toggle ─────────────────────────────────────
+    const pwInput    = document.getElementById('password');
+    const pwToggle   = document.getElementById('pwToggle');
+    const eyeIcon    = document.getElementById('eyeIcon');
+    const eyeOffIcon = document.getElementById('eyeOffIcon');
+
+    pwToggle.addEventListener('click', () => {
+      const isHidden = pwInput.type === 'password';
+      pwInput.type = isHidden ? 'text' : 'password';
+      eyeIcon.style.display    = isHidden ? 'none' : '';
+      eyeOffIcon.style.display = isHidden ? ''     : 'none';
+    });
+
+    // ── Live password strength indicator ─────────────────────────────
+    const bars  = [document.getElementById('bar1'), document.getElementById('bar2'), document.getElementById('bar3')];
+    const label = document.getElementById('pwStrengthLabel');
+
+    function getStrength(pw) {
+      if (pw.length < 4) return 0;
+      let score = 0;
+      if (pw.length >= 6)  score++;
+      if (pw.length >= 10) score++;
+      if (/[A-Z]/.test(pw) && /[0-9]/.test(pw)) score++;
+      if (/[^A-Za-z0-9]/.test(pw)) score++;
+      return Math.min(score, 3);
+    }
+
+    pwInput.addEventListener('input', () => {
+      const pw = pwInput.value;
+      if (!pw) {
+        bars.forEach(b => b.className = 'pw-strength-bar');
+        label.textContent = '';
+        return;
+      }
+      const strength = getStrength(pw);
+      const levelClass = ['', 'weak', 'medium', 'strong'][strength];
+      const levelText  = ['', 'Weak', 'Fair', 'Strong'][strength];
+
+      bars.forEach((b, i) => {
+        b.className = 'pw-strength-bar' + (i < strength ? ' ' + levelClass : '');
+      });
+      label.textContent = pw.length > 0 ? levelText : '';
+    });
+
+    // ── Alert helpers ─────────────────────────────────────────────────
     function showError(msg) {
       alertBox.textContent = msg;
       alertBox.className = 'alert alert-error show';
@@ -167,7 +375,7 @@
       e.preventDefault();
 
       const email    = document.getElementById('email').value.trim();
-      const password = document.getElementById('password').value;
+      const password = pwInput.value;
 
       submitBtn.disabled = true;
       submitBtn.innerHTML = '<span class="spinner"></span> Creating account…';
@@ -176,19 +384,15 @@
         const result = await API.signup(email, password);
 
         if (result.success) {
-          // Auto-login after signup so user lands on profile with a session
           showSuccess('Account created! Logging you in…');
 
           try {
-            // Attempt immediate login so they have a token for profile page
             await API.login(email, password);
           } catch (_) {
-            // If auto-login fails, that's okay; redirect to login page instead
             setTimeout(() => window.location.href = 'login.html', 1500);
             return;
           }
 
-          // ✅ Redirect to profile.html to complete onboarding
           showSuccess('✅ Account created! Let\'s set up your profile…');
           setTimeout(() => window.location.href = 'profile.html', 1200);
 
@@ -200,7 +404,7 @@
         showError(err.message || 'Something went wrong. Please try again.');
       } finally {
         submitBtn.disabled = false;
-        submitBtn.textContent = 'Create account';
+        submitBtn.textContent = 'Create Free Account →';
       }
     });
   </script>
