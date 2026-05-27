@@ -1,0 +1,9 @@
+2026-05-26 12:14:36 | INFO     | getspons.main | → OPTIONS /api/profile/me | ip=127.0.0.1
+2026-05-26 12:14:36 | INFO     | getspons.main | → OPTIONS /api/pitches/mine | ip=127.0.0.1
+2026-05-26 12:14:36 | INFO     | getspons.main | → OPTIONS /api/mediakit/saved | ip=127.0.0.1
+2026-05-26 12:14:36 | INFO     | getspons.main | ← OPTIONS /api/profile/me | status=200 | 2.1ms
+2026-05-26 12:14:36 | INFO     | getspons.main | ← OPTIONS /api/pitches/mine | status=200 | 2.6ms
+2026-05-26 12:14:36 | INFO     | getspons.main | ← OPTIONS /api/mediakit/saved | status=200 | 3.2ms
+2026-05-26 12:14:36 | INFO     | getspons.main | → GET /api/profile/me | ip=127.0.0.1
+2026-05-26 12:14:36 | INFO     | getspons.main | → GET /api/mediakit/saved | ip=127.0.0.1
+2026-05-26 12:14:36 | INFO     | getspons.main | → GET /api/pitches/mine | ip=127.0.0.1
