@@ -43,7 +43,7 @@ class ResetPasswordInput(BaseModel):
 
 
 @router.post("/signup")
-@limiter.limit("5/hour")
+@limiter.limit("10/hour")
 def signup(request: Request,data: AuthInput):
     log.info("Signup attempt | email=%s", data.email)
     try:
@@ -65,7 +65,7 @@ def signup(request: Request,data: AuthInput):
 
 
 @router.post("/login")
-@limiter.limit("10/hour")
+@limiter.limit("15/hour")
 def login(request: Request,data: AuthInput):
     log.info("Login attempt | email=%s", data.email)
     try:
