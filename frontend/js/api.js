@@ -111,7 +111,7 @@ export const API = {
 
   logout() {
     clearToken();
-    window.location.href = "/login.html";
+    window.location.href = "login.html";
   },
 
   // ─── Profile ───────────────────────────────────────────────────────────────
