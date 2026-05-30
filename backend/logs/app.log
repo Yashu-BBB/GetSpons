@@ -154,3 +154,18 @@
 2026-05-30 21:10:01 | DEBUG    | getspons.cache | Cache SET | key=inbox_creator_30e39d50-960d-4f2c-b7ec-a8ecdbeea896 | ttl=60s
 2026-05-30 21:10:01 | INFO     | getspons.inbox | Creator inbox returned 1 messages | creator_id=30e39d50-960d-4f2c-b7ec-a8ecdbeea896
 2026-05-30 21:10:01 | INFO     | getspons.main | ← GET /api/inbox/creator | status=200 | 594.0ms
+2026-05-30 21:30:03 | INFO     | getspons.main | → POST /api/brand-auth/login | ip=127.0.0.1
+2026-05-30 21:30:03 | INFO     | getspons.brand_auth | Brand login attempt | email=test@brandcompany.com
+2026-05-30 21:30:08 | INFO     | getspons.brand_auth | Brand login successful | email=test@brandcompany.com | brand_user_id=0264c293-22c4-4122-b600-8451cfb048e5
+2026-05-30 21:30:08 | WARNING  | getspons.main | ← POST /api/brand-auth/login | status=200 | 5027.2ms  ⚠ SLOW REQUEST
+2026-05-30 21:30:08 | INFO     | getspons.main | → POST /api/brand-profile/generate-brief | ip=127.0.0.1
+2026-05-30 21:30:08 | INFO     | getspons.brand_profile | Campaign brief generation started | brand_user_id=0264c293-22c4-4122-b600-8451cfb048e5
+2026-05-30 21:30:08 | INFO     | getspons.brand_profile | No existing brand profile found for brief context | brand_user_id=0264c293-22c4-4122-b600-8451cfb048e5
+2026-05-30 21:30:08 | INFO     | getspons.brand_profile | Campaign brief generated | brand_user_id=0264c293-22c4-4122-b600-8451cfb048e5
+2026-05-30 21:30:08 | INFO     | getspons.brand_profile | Campaign brief saved | brand_user_id=0264c293-22c4-4122-b600-8451cfb048e5
+2026-05-30 21:30:08 | INFO     | getspons.main | ← POST /api/brand-profile/generate-brief | status=200 | 611.5ms
+2026-05-30 21:30:08 | INFO     | getspons.main | → GET /api/brand-profile/brief | ip=127.0.0.1
+2026-05-30 21:30:09 | DEBUG    | getspons.cache | Cache MISS | key=campaign_brief_0264c293-22c4-4122-b600-8451cfb048e5
+2026-05-30 21:30:09 | INFO     | getspons.brand_profile | Campaign brief fetch | brand_user_id=0264c293-22c4-4122-b600-8451cfb048e5
+2026-05-30 21:30:09 | DEBUG    | getspons.cache | Cache SET | key=campaign_brief_0264c293-22c4-4122-b600-8451cfb048e5 | ttl=300s
+2026-05-30 21:30:09 | INFO     | getspons.main | ← GET /api/brand-profile/brief | status=200 | 267.1ms

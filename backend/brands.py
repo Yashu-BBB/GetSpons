@@ -3,7 +3,7 @@ brands.py — Brands router for GetSpons.
 
 Exposes:
     GET /brands              Lightweight list with optional filters. Cached 600s.
-    GET /brands/{brand_id}   Full brand detail. Cached 600s.
+    GET /brands/{brand_id}   Full brand detail including campaign_brief. Cached 600s.
 
 Caching
 -------
@@ -28,7 +28,7 @@ from logger import get_logger
 router = APIRouter()
 log = get_logger(__name__)
 
-_BRANDS_TTL = 600   # 10 minutes cache
+_BRANDS_TTL = 600   # 10 minutes
 
 # ---------------------------------------------------------------------------
 # Column sets
@@ -40,15 +40,17 @@ _LIST_COLUMNS = (
     "instagram_handle, youtube_handle, country, active"
 )
 
+# campaign_brief added to detail columns
 _DETAIL_COLUMNS = (
     "id, name, niche, min_followers, max_followers, "
     "content_types, campaign_budget_min, campaign_budget_max, "
     "instagram_handle, youtube_handle, country, active, "
-    "description, audience_requirement, contact_email, website"
+    "description, audience_requirement, contact_email, website, "
+    "campaign_brief"
 )
 
 # ---------------------------------------------------------------------------
-# Sample brands — shown when DB table is empty (demo / dev mode)
+# Sample brands
 # ---------------------------------------------------------------------------
 
 SAMPLE_BRANDS = [
@@ -69,6 +71,7 @@ SAMPLE_BRANDS = [
         "contact_email": "influencer@mamaearth.in",
         "website": "https://mamaearth.in",
         "active": True,
+        "campaign_brief": None,
     },
     {
         "id": "sample-002",
@@ -87,6 +90,7 @@ SAMPLE_BRANDS = [
         "contact_email": "collab@boat-lifestyle.com",
         "website": "https://www.boat-lifestyle.com",
         "active": True,
+        "campaign_brief": None,
     },
     {
         "id": "sample-003",
@@ -105,6 +109,7 @@ SAMPLE_BRANDS = [
         "contact_email": "partnerships@ragecoffee.com",
         "website": "https://www.ragecoffee.com",
         "active": True,
+        "campaign_brief": None,
     },
     {
         "id": "sample-004",
@@ -123,6 +128,7 @@ SAMPLE_BRANDS = [
         "contact_email": "creator@cult.fit",
         "website": "https://www.cult.fit",
         "active": True,
+        "campaign_brief": None,
     },
     {
         "id": "sample-005",
@@ -141,6 +147,7 @@ SAMPLE_BRANDS = [
         "contact_email": "influencer@goniyo.com",
         "website": "https://www.goniyo.com",
         "active": True,
+        "campaign_brief": None,
     },
     {
         "id": "sample-006",
@@ -159,6 +166,7 @@ SAMPLE_BRANDS = [
         "contact_email": "collab@thesouledstore.com",
         "website": "https://www.thesouledstore.com",
         "active": True,
+        "campaign_brief": None,
     },
 ]
 
@@ -177,19 +185,17 @@ def get_brands(
 ):
     """Return a lightweight list of brands with optional filtering.
 
-    Falls back to SAMPLE_BRANDS when the DB table is empty or unavailable,
-    ensuring the UI always has data to display.
+    Falls back to SAMPLE_BRANDS when the DB table is empty or unavailable.
+    campaign_brief is intentionally excluded from the list to keep payloads small.
     """
     cache_key = f"brands_list_{niche}_{min_followers}"
 
-    # ── Cache hit ─────────────────────────────────────────────────────
     cached = cache.get(cache_key)
     if cached is not None:
         return cached
 
-    # ── Cache miss — query Supabase ───────────────────────────────────
     filter_str = f"niche={niche}, min_followers={min_followers}"
-    log.info("Brands list fetched | filters=[%s]", filter_str)
+    log.info("Brands list fetch | filters=[%s]", filter_str)
 
     try:
         query = supabase_admin.table("brands").select(_LIST_COLUMNS)
@@ -206,7 +212,6 @@ def get_brands(
         log.warning("Brands DB query failed, using sample data: %s", exc)
         data = []
 
-    # ── Fall back to sample brands if DB is empty ─────────────────────
     if not data:
         log.info("No brands in DB — serving sample data")
         data = _apply_sample_filters(SAMPLE_BRANDS, niche, min_followers)
@@ -216,21 +221,27 @@ def get_brands(
 
 
 # ---------------------------------------------------------------------------
-# GET /brands/{brand_id}  — full detail, cached
+# GET /brands/{brand_id}  — full detail including campaign_brief, cached
 # ---------------------------------------------------------------------------
 
 
 @router.get("/{brand_id}", response_model=None)
 def get_brand(brand_id: str):
-    """Return full detail for a single brand. Falls back to sample data."""
+    """Return full detail for a single brand, including campaign_brief.
+
+    campaign_brief is stored in brand_profiles (for registered brands) or
+    is None for sample/unregistered brands.  The field is included so that
+    creators viewing a brand's detail page can see the active campaign brief.
+
+    Falls back to SAMPLE_BRANDS for sample ids.
+    """
     cache_key = f"brand_detail_{brand_id}"
 
-    # ── Cache hit ─────────────────────────────────────────────────────
     cached = cache.get(cache_key)
     if cached is not None:
         return cached
 
-    # ── Cache miss — query Supabase ───────────────────────────────────
+    # ── Try DB first ──────────────────────────────────────────────────
     try:
         result = (
             supabase_admin
@@ -242,17 +253,25 @@ def get_brand(brand_id: str):
         )
 
         if result.data:
+            brand = result.data
+
+            # Enrich with campaign_brief from brand_profiles if available.
+            # The brands table stores contact_email; brand_profiles links via brand_user_id.
+            # We join through brand_users to find the matching brand_profiles row.
+            if brand.get("contact_email"):
+                brief = _fetch_campaign_brief_by_email(brand["contact_email"])
+                brand["campaign_brief"] = brief
+
             log.info("Single brand fetched from DB | brand_id=%s", brand_id)
-            cache.set(cache_key, result.data, ttl_seconds=_BRANDS_TTL)
-            return result.data
+            cache.set(cache_key, brand, ttl_seconds=_BRANDS_TTL)
+            return brand
 
     except Exception as exc:
         error_str = str(exc).lower()
-        # 404 from Supabase — fall through to sample lookup below
         if "no rows" not in error_str and "json object requested" not in error_str:
             log.warning("Brand DB fetch error, trying sample: %s", exc)
 
-    # ── Fall back to sample data by id ────────────────────────────────
+    # ── Fall back to sample data ──────────────────────────────────────
     sample = next((b for b in SAMPLE_BRANDS if b["id"] == brand_id), None)
     if sample:
         log.info("Serving sample brand | brand_id=%s", brand_id)
@@ -267,8 +286,54 @@ def get_brand(brand_id: str):
 
 
 # ---------------------------------------------------------------------------
-# Internal helper
+# Private helpers
 # ---------------------------------------------------------------------------
+
+
+def _fetch_campaign_brief_by_email(contact_email: str):
+    """Look up a brand's campaign_brief via their contact email.
+
+    brands.contact_email → brand_users.email → brand_profiles.campaign_brief
+
+    Returns the parsed campaign_brief dict, or None if not found.
+    """
+    import json as _json  # local import to avoid top-level side-effects
+
+    try:
+        # Find brand_user_id matching contact_email
+        bu_res = (
+            supabase_admin
+            .table("brand_users")
+            .select("id")
+            .eq("email", contact_email)
+            .single()
+            .execute()
+        )
+        if not bu_res.data:
+            return None
+
+        brand_user_id = bu_res.data["id"]
+
+        # Fetch campaign_brief from brand_profiles
+        bp_res = (
+            supabase_admin
+            .table("brand_profiles")
+            .select("campaign_brief")
+            .eq("brand_user_id", brand_user_id)
+            .single()
+            .execute()
+        )
+        if not bp_res.data or not bp_res.data.get("campaign_brief"):
+            return None
+
+        raw = bp_res.data["campaign_brief"]
+        # brief is stored as a JSON string; parse it back
+        return _json.loads(raw) if isinstance(raw, str) else raw
+
+    except Exception as exc:
+        log.debug("campaign_brief lookup failed for email=%s: %s", contact_email, exc)
+        return None
+
 
 def _apply_sample_filters(brands: list, niche: Optional[str], min_followers: Optional[int]) -> list:
     """Apply niche and min_followers filters to the sample brand list."""
