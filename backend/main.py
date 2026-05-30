@@ -35,6 +35,7 @@ from brand_profile import router as brand_profile_router
 from match import router as match_router
 from social_auth import router as social_auth_router
 from authenticity import router as authenticity_router
+from inbox import router as inbox_router
 load_dotenv()
 
 log = get_logger(__name__)
@@ -185,6 +186,7 @@ app.include_router(brand_profile_router, prefix="/api/brand-profile")
 app.include_router(match_router,         prefix="/api/match")
 app.include_router(social_auth_router, prefix="/api/social")
 app.include_router(authenticity_router, prefix="/api/authenticity")
+app.include_router(inbox_router,    prefix="/api/inbox")
 # ---------------------------------------------------------------------------
 # Health check
 # ---------------------------------------------------------------------------

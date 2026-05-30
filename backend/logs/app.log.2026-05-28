@@ -1,0 +1,215 @@
+2026-05-28 11:43:27 | INFO     | getspons.main | → OPTIONS /api/profile/me | ip=127.0.0.1
+2026-05-28 11:43:28 | INFO     | getspons.main | → OPTIONS /api/mediakit/saved | ip=127.0.0.1
+2026-05-28 11:43:28 | INFO     | getspons.main | → OPTIONS /api/pitches/mine | ip=127.0.0.1
+2026-05-28 11:43:28 | INFO     | getspons.main | ← OPTIONS /api/profile/me | status=200 | 35.1ms
+2026-05-28 11:43:28 | INFO     | getspons.main | ← OPTIONS /api/mediakit/saved | status=200 | 35.3ms
+2026-05-28 11:43:28 | INFO     | getspons.main | ← OPTIONS /api/pitches/mine | status=200 | 163.7ms
+2026-05-28 11:43:28 | INFO     | getspons.main | → GET /api/profile/me | ip=127.0.0.1
+2026-05-28 11:43:28 | INFO     | getspons.main | → GET /api/mediakit/saved | ip=127.0.0.1
+2026-05-28 11:43:28 | INFO     | getspons.main | → GET /api/pitches/mine | ip=127.0.0.1
+2026-05-28 11:43:30 | INFO     | getspons.main | ← GET /api/mediakit/saved | status=401 | 1651.4ms
+2026-05-28 11:43:30 | INFO     | getspons.main | ← GET /api/profile/me | status=401 | 1739.2ms
+2026-05-28 11:43:30 | INFO     | getspons.main | ← GET /api/pitches/mine | status=401 | 1647.3ms
+2026-05-28 11:43:31 | INFO     | getspons.main | → OPTIONS /api/mediakit/generate | ip=127.0.0.1
+2026-05-28 11:43:31 | INFO     | getspons.main | ← OPTIONS /api/mediakit/generate | status=200 | 1.2ms
+2026-05-28 11:43:31 | INFO     | getspons.main | → POST /api/mediakit/generate | ip=127.0.0.1
+2026-05-28 11:43:31 | INFO     | getspons.main | ← POST /api/mediakit/generate | status=422 | 31.5ms
+2026-05-28 11:43:44 | INFO     | getspons.main | → OPTIONS /api/auth/login | ip=127.0.0.1
+2026-05-28 11:43:44 | INFO     | getspons.main | ← OPTIONS /api/auth/login | status=200 | 6.0ms
+2026-05-28 11:43:45 | INFO     | getspons.main | → POST /api/auth/login | ip=127.0.0.1
+2026-05-28 11:43:45 | INFO     | getspons.auth | Login attempt | email=yashuB@gmail.com
+2026-05-28 11:43:46 | WARNING  | getspons.auth | Login failed | email=yashuB@gmail.com | reason=Invalid login credentials
+2026-05-28 11:43:46 | INFO     | getspons.main | ← POST /api/auth/login | status=200 | 1217.0ms
+2026-05-28 11:44:26 | INFO     | getspons.main | → OPTIONS /api/auth/signup | ip=127.0.0.1
+2026-05-28 11:44:26 | INFO     | getspons.main | ← OPTIONS /api/auth/signup | status=200 | 1.3ms
+2026-05-28 11:44:26 | INFO     | getspons.main | → POST /api/auth/signup | ip=127.0.0.1
+2026-05-28 11:44:26 | INFO     | getspons.auth | Signup attempt | email=yashuB@gmail.com
+2026-05-28 11:44:27 | INFO     | getspons.auth | Signup successful | email=yashuB@gmail.com | user_id=328700f9-7a2a-4f11-b526-6fade20300f4
+2026-05-28 11:44:27 | INFO     | getspons.main | ← POST /api/auth/signup | status=200 | 1104.4ms
+2026-05-28 11:44:27 | INFO     | getspons.main | → POST /api/auth/login | ip=127.0.0.1
+2026-05-28 11:44:27 | INFO     | getspons.auth | Login attempt | email=yashuB@gmail.com
+2026-05-28 11:44:27 | INFO     | getspons.auth | Login successful | email=yashuB@gmail.com | user_id=328700f9-7a2a-4f11-b526-6fade20300f4
+2026-05-28 11:44:27 | INFO     | getspons.main | ← POST /api/auth/login | status=200 | 258.9ms
+2026-05-28 11:44:30 | INFO     | getspons.main | → GET /api/profile/me | ip=127.0.0.1
+2026-05-28 11:44:30 | DEBUG    | getspons.cache | Cache MISS | key=profile_328700f9-7a2a-4f11-b526-6fade20300f4
+2026-05-28 11:44:30 | INFO     | getspons.profile | Profile fetch | user_id=328700f9-7a2a-4f11-b526-6fade20300f4
+2026-05-28 11:44:32 | WARNING  | getspons.main | ← GET /api/profile/me | status=400 | 2676.7ms  ⚠ SLOW REQUEST
+2026-05-28 11:46:52 | INFO     | getspons.main | → OPTIONS /api/profile/save | ip=127.0.0.1
+2026-05-28 11:46:52 | INFO     | getspons.main | ← OPTIONS /api/profile/save | status=200 | 6.0ms
+2026-05-28 11:46:52 | INFO     | getspons.main | → POST /api/profile/save | ip=127.0.0.1
+2026-05-28 11:46:54 | INFO     | getspons.profile | Profile save attempt | user_id=328700f9-7a2a-4f11-b526-6fade20300f4
+2026-05-28 11:46:55 | INFO     | getspons.profile | Profile saved successfully | user_id=328700f9-7a2a-4f11-b526-6fade20300f4
+2026-05-28 11:46:55 | WARNING  | getspons.main | ← POST /api/profile/save | status=200 | 2161.0ms  ⚠ SLOW REQUEST
+2026-05-28 11:46:57 | INFO     | getspons.main | → GET /api/mediakit/saved | ip=127.0.0.1
+2026-05-28 11:46:57 | INFO     | getspons.main | → GET /api/pitches/mine | ip=127.0.0.1
+2026-05-28 11:46:58 | DEBUG    | getspons.cache | Cache MISS | key=mediakit_328700f9-7a2a-4f11-b526-6fade20300f4
+2026-05-28 11:46:58 | INFO     | getspons.main | → GET /api/profile/me | ip=127.0.0.1
+2026-05-28 11:46:58 | INFO     | getspons.main | ← GET /api/mediakit/saved | status=500 | 984.6ms
+2026-05-28 11:46:59 | INFO     | getspons.main | ← GET /api/pitches/mine | status=200 | 849.6ms
+2026-05-28 11:46:59 | INFO     | getspons.main | → OPTIONS /api/mediakit/generate | ip=127.0.0.1
+2026-05-28 11:46:59 | INFO     | getspons.main | ← OPTIONS /api/mediakit/generate | status=200 | 1.4ms
+2026-05-28 11:46:59 | INFO     | getspons.main | → POST /api/mediakit/generate | ip=127.0.0.1
+2026-05-28 11:46:59 | DEBUG    | getspons.cache | Cache MISS | key=profile_328700f9-7a2a-4f11-b526-6fade20300f4
+2026-05-28 11:46:59 | INFO     | getspons.profile | Profile fetch | user_id=328700f9-7a2a-4f11-b526-6fade20300f4
+2026-05-28 11:47:00 | DEBUG    | getspons.cache | Cache SET | key=profile_328700f9-7a2a-4f11-b526-6fade20300f4 | ttl=300s
+2026-05-28 11:47:00 | INFO     | getspons.main | ← GET /api/profile/me | status=200 | 1366.8ms
+2026-05-28 11:47:00 | INFO     | getspons.mediakit | Media kit generation started | user_id=328700f9-7a2a-4f11-b526-6fade20300f4
+2026-05-28 11:47:00 | INFO     | getspons.mediakit | Media kit generated and saved successfully | user_id=328700f9-7a2a-4f11-b526-6fade20300f4
+2026-05-28 11:47:00 | INFO     | getspons.main | ← POST /api/mediakit/generate | status=200 | 490.6ms
+2026-05-28 11:47:54 | INFO     | getspons.main | → POST /api/auth/login | ip=127.0.0.1
+2026-05-28 11:47:54 | INFO     | getspons.auth | Login attempt | email=yashuB@gmail.com
+2026-05-28 11:47:55 | INFO     | getspons.auth | Login successful | email=yashuB@gmail.com | user_id=328700f9-7a2a-4f11-b526-6fade20300f4
+2026-05-28 11:47:55 | INFO     | getspons.main | ← POST /api/auth/login | status=200 | 1310.2ms
+2026-05-28 11:47:57 | INFO     | getspons.main | → GET /api/profile/me | ip=127.0.0.1
+2026-05-28 11:47:57 | INFO     | getspons.main | → GET /api/mediakit/saved | ip=127.0.0.1
+2026-05-28 11:47:57 | INFO     | getspons.main | → GET /api/pitches/mine | ip=127.0.0.1
+2026-05-28 11:47:57 | DEBUG    | getspons.cache | Cache MISS | key=mediakit_328700f9-7a2a-4f11-b526-6fade20300f4
+2026-05-28 11:47:57 | DEBUG    | getspons.cache | Cache HIT | key=profile_328700f9-7a2a-4f11-b526-6fade20300f4
+2026-05-28 11:47:58 | INFO     | getspons.main | ← GET /api/profile/me | status=200 | 653.1ms
+2026-05-28 11:47:58 | DEBUG    | getspons.cache | Cache SET | key=mediakit_328700f9-7a2a-4f11-b526-6fade20300f4 | ttl=300s
+2026-05-28 11:47:59 | INFO     | getspons.main | ← GET /api/mediakit/saved | status=200 | 1747.2ms
+2026-05-28 11:47:59 | INFO     | getspons.main | ← GET /api/pitches/mine | status=200 | 1764.3ms
+2026-05-28 11:48:39 | INFO     | getspons.main | → POST /api/auth/login | ip=127.0.0.1
+2026-05-28 11:48:39 | INFO     | getspons.auth | Login attempt | email=yashuB@gmail.com
+2026-05-28 11:48:40 | INFO     | getspons.auth | Login successful | email=yashuB@gmail.com | user_id=328700f9-7a2a-4f11-b526-6fade20300f4
+2026-05-28 11:48:40 | INFO     | getspons.main | ← POST /api/auth/login | status=200 | 1013.2ms
+2026-05-28 11:48:41 | INFO     | getspons.main | → GET /api/profile/me | ip=127.0.0.1
+2026-05-28 11:48:41 | INFO     | getspons.main | → GET /api/mediakit/saved | ip=127.0.0.1
+2026-05-28 11:48:41 | INFO     | getspons.main | → GET /api/pitches/mine | ip=127.0.0.1
+2026-05-28 11:48:42 | DEBUG    | getspons.cache | Cache HIT | key=mediakit_328700f9-7a2a-4f11-b526-6fade20300f4
+2026-05-28 11:48:42 | DEBUG    | getspons.cache | Cache HIT | key=profile_328700f9-7a2a-4f11-b526-6fade20300f4
+2026-05-28 11:48:42 | INFO     | getspons.main | ← GET /api/mediakit/saved | status=200 | 174.0ms
+2026-05-28 11:48:42 | INFO     | getspons.main | ← GET /api/profile/me | status=200 | 678.0ms
+2026-05-28 11:48:43 | INFO     | getspons.main | ← GET /api/pitches/mine | status=200 | 1191.7ms
+2026-05-28 11:52:29 | INFO     | getspons.main | → POST /api/mediakit/generate | ip=127.0.0.1
+2026-05-28 11:52:31 | INFO     | getspons.mediakit | Media kit generation started | user_id=328700f9-7a2a-4f11-b526-6fade20300f4
+2026-05-28 11:52:31 | DEBUG    | getspons.cache | Cache DELETE | key=mediakit_328700f9-7a2a-4f11-b526-6fade20300f4
+2026-05-28 11:52:31 | INFO     | getspons.mediakit | Media kit generated and saved successfully | user_id=328700f9-7a2a-4f11-b526-6fade20300f4
+2026-05-28 11:52:31 | WARNING  | getspons.main | ← POST /api/mediakit/generate | status=200 | 2596.7ms  ⚠ SLOW REQUEST
+2026-05-28 11:52:49 | INFO     | getspons.main | → OPTIONS /api/mediakit/pdf | ip=127.0.0.1
+2026-05-28 11:52:49 | INFO     | getspons.main | ← OPTIONS /api/mediakit/pdf | status=200 | 1.1ms
+2026-05-28 11:52:49 | INFO     | getspons.main | → POST /api/mediakit/pdf | ip=127.0.0.1
+2026-05-28 11:52:50 | INFO     | getspons.mediakit | PDF generation started | user_id=328700f9-7a2a-4f11-b526-6fade20300f4
+2026-05-28 11:52:50 | DEBUG    | getspons.cache | Cache MISS | key=mediakit_328700f9-7a2a-4f11-b526-6fade20300f4
+2026-05-28 11:52:56 | INFO     | getspons.mediakit | PDF generated successfully | user_id=328700f9-7a2a-4f11-b526-6fade20300f4
+2026-05-28 11:52:56 | WARNING  | getspons.main | ← POST /api/mediakit/pdf | status=200 | 6756.6ms  ⚠ SLOW REQUEST
+2026-05-28 11:54:26 | INFO     | getspons.main | → OPTIONS /api/brands/ | ip=127.0.0.1
+2026-05-28 11:54:26 | INFO     | getspons.main | ← OPTIONS /api/brands/ | status=200 | 1.1ms
+2026-05-28 11:54:30 | INFO     | getspons.main | → GET /api/brands/ | ip=127.0.0.1
+2026-05-28 11:54:31 | DEBUG    | getspons.cache | Cache MISS | key=brands_list_None_None
+2026-05-28 11:54:31 | INFO     | getspons.brands | Brands list fetched | filters=[niche=None, min_followers=None]
+2026-05-28 11:54:32 | DEBUG    | getspons.cache | Cache SET | key=brands_list_None_None | ttl=600s
+2026-05-28 11:54:32 | INFO     | getspons.main | ← GET /api/brands/ | status=200 | 1754.0ms
+2026-05-28 11:54:41 | INFO     | getspons.main | → OPTIONS /api/brands/8dcb5b3c-eb9e-4346-9105-a3c5793fc9d4 | ip=127.0.0.1
+2026-05-28 11:54:41 | INFO     | getspons.main | ← OPTIONS /api/brands/8dcb5b3c-eb9e-4346-9105-a3c5793fc9d4 | status=200 | 4.8ms
+2026-05-28 11:54:42 | INFO     | getspons.main | → GET /api/brands/8dcb5b3c-eb9e-4346-9105-a3c5793fc9d4 | ip=127.0.0.1
+2026-05-28 11:54:42 | DEBUG    | getspons.cache | Cache MISS | key=brand_detail_8dcb5b3c-eb9e-4346-9105-a3c5793fc9d4
+2026-05-28 11:54:43 | INFO     | getspons.brands | Single brand fetched from DB | brand_id=8dcb5b3c-eb9e-4346-9105-a3c5793fc9d4
+2026-05-28 11:54:43 | DEBUG    | getspons.cache | Cache SET | key=brand_detail_8dcb5b3c-eb9e-4346-9105-a3c5793fc9d4 | ttl=600s
+2026-05-28 11:54:43 | INFO     | getspons.main | ← GET /api/brands/8dcb5b3c-eb9e-4346-9105-a3c5793fc9d4 | status=200 | 1032.3ms
+2026-05-28 11:54:55 | INFO     | getspons.main | → OPTIONS /api/pitches/generate | ip=127.0.0.1
+2026-05-28 11:54:55 | INFO     | getspons.main | ← OPTIONS /api/pitches/generate | status=200 | 1.9ms
+2026-05-28 11:54:55 | INFO     | getspons.main | → POST /api/pitches/generate | ip=127.0.0.1
+2026-05-28 11:54:56 | INFO     | getspons.pitch | Pitch generation started | user_id=328700f9-7a2a-4f11-b526-6fade20300f4 | brand_id=8dcb5b3c-eb9e-4346-9105-a3c5793fc9d4
+2026-05-28 11:54:57 | INFO     | getspons.pitch | Pitch generated and saved successfully | user_id=328700f9-7a2a-4f11-b526-6fade20300f4 | pitch_id=1d689ebb-ccac-4a66-b892-e487a62877c0
+2026-05-28 11:54:57 | INFO     | getspons.main | ← POST /api/pitches/generate | status=200 | 1147.2ms
+2026-05-28 11:55:09 | INFO     | getspons.main | → OPTIONS /api/pitches/1d689ebb-ccac-4a66-b892-e487a62877c0 | ip=127.0.0.1
+2026-05-28 11:55:09 | INFO     | getspons.main | ← OPTIONS /api/pitches/1d689ebb-ccac-4a66-b892-e487a62877c0 | status=200 | 1.3ms
+2026-05-28 11:55:09 | INFO     | getspons.main | → PATCH /api/pitches/1d689ebb-ccac-4a66-b892-e487a62877c0 | ip=127.0.0.1
+2026-05-28 11:55:11 | INFO     | getspons.pitch | Pitch status updated | pitch_id=1d689ebb-ccac-4a66-b892-e487a62877c0 | new_status=sent | user_id=328700f9-7a2a-4f11-b526-6fade20300f4
+2026-05-28 11:55:11 | INFO     | getspons.main | ← PATCH /api/pitches/1d689ebb-ccac-4a66-b892-e487a62877c0 | status=200 | 1822.3ms
+2026-05-28 11:55:40 | INFO     | getspons.main | → OPTIONS /api/pitches/1d689ebb-ccac-4a66-b892-e487a62877c0/content | ip=127.0.0.1
+2026-05-28 11:55:41 | INFO     | getspons.main | ← OPTIONS /api/pitches/1d689ebb-ccac-4a66-b892-e487a62877c0/content | status=200 | 3.0ms
+2026-05-28 11:55:41 | INFO     | getspons.main | → PATCH /api/pitches/1d689ebb-ccac-4a66-b892-e487a62877c0/content | ip=127.0.0.1
+2026-05-28 11:55:42 | INFO     | getspons.pitch | Pitch content edited | pitch_id=1d689ebb-ccac-4a66-b892-e487a62877c0 | fields=['subject', 'body'] | user_id=328700f9-7a2a-4f11-b526-6fade20300f4
+2026-05-28 11:55:42 | INFO     | getspons.main | ← PATCH /api/pitches/1d689ebb-ccac-4a66-b892-e487a62877c0/content | status=200 | 1147.6ms
+2026-05-28 11:56:36 | INFO     | getspons.main | → POST /api/pitches/generate | ip=127.0.0.1
+2026-05-28 11:56:37 | INFO     | getspons.pitch | Pitch generation started | user_id=328700f9-7a2a-4f11-b526-6fade20300f4 | brand_id=e02c11e5-c743-4834-8f2c-1525ed129f50
+2026-05-28 11:56:38 | INFO     | getspons.pitch | Pitch generated and saved successfully | user_id=328700f9-7a2a-4f11-b526-6fade20300f4 | pitch_id=59aa5a92-1234-4cdc-805c-2a6de59df151
+2026-05-28 11:56:38 | INFO     | getspons.main | ← POST /api/pitches/generate | status=200 | 1885.6ms
+2026-05-28 11:56:54 | INFO     | getspons.main | → OPTIONS /api/pitches/59aa5a92-1234-4cdc-805c-2a6de59df151/content | ip=127.0.0.1
+2026-05-28 11:56:54 | INFO     | getspons.main | ← OPTIONS /api/pitches/59aa5a92-1234-4cdc-805c-2a6de59df151/content | status=200 | 37.8ms
+2026-05-28 11:56:54 | INFO     | getspons.main | → PATCH /api/pitches/59aa5a92-1234-4cdc-805c-2a6de59df151/content | ip=127.0.0.1
+2026-05-28 11:56:56 | INFO     | getspons.pitch | Pitch content edited | pitch_id=59aa5a92-1234-4cdc-805c-2a6de59df151 | fields=['subject', 'body'] | user_id=328700f9-7a2a-4f11-b526-6fade20300f4
+2026-05-28 11:56:56 | INFO     | getspons.main | ← PATCH /api/pitches/59aa5a92-1234-4cdc-805c-2a6de59df151/content | status=200 | 1500.3ms
+2026-05-28 11:57:07 | INFO     | getspons.main | → OPTIONS /api/profile/me | ip=127.0.0.1
+2026-05-28 11:57:07 | INFO     | getspons.main | ← OPTIONS /api/profile/me | status=200 | 1.6ms
+2026-05-28 11:57:08 | INFO     | getspons.main | → GET /api/profile/me | ip=127.0.0.1
+2026-05-28 11:57:09 | DEBUG    | getspons.cache | Cache EXPIRED | key=profile_328700f9-7a2a-4f11-b526-6fade20300f4
+2026-05-28 11:57:09 | INFO     | getspons.profile | Profile fetch | user_id=328700f9-7a2a-4f11-b526-6fade20300f4
+2026-05-28 11:57:10 | DEBUG    | getspons.cache | Cache SET | key=profile_328700f9-7a2a-4f11-b526-6fade20300f4 | ttl=300s
+2026-05-28 11:57:10 | INFO     | getspons.main | ← GET /api/profile/me | status=200 | 1545.1ms
+2026-05-28 11:57:18 | INFO     | getspons.main | → OPTIONS /api/profile/save | ip=127.0.0.1
+2026-05-28 11:57:19 | INFO     | getspons.main | ← OPTIONS /api/profile/save | status=200 | 1.1ms
+2026-05-28 11:57:19 | INFO     | getspons.main | → POST /api/profile/save | ip=127.0.0.1
+2026-05-28 11:57:19 | INFO     | getspons.profile | Profile save attempt | user_id=328700f9-7a2a-4f11-b526-6fade20300f4
+2026-05-28 11:57:20 | DEBUG    | getspons.cache | Cache DELETE | key=profile_328700f9-7a2a-4f11-b526-6fade20300f4
+2026-05-28 11:57:20 | INFO     | getspons.profile | Profile saved successfully | user_id=328700f9-7a2a-4f11-b526-6fade20300f4
+2026-05-28 11:57:20 | INFO     | getspons.main | ← POST /api/profile/save | status=200 | 1265.1ms
+2026-05-28 11:57:22 | INFO     | getspons.main | → OPTIONS /api/mediakit/saved | ip=127.0.0.1
+2026-05-28 11:57:22 | INFO     | getspons.main | → OPTIONS /api/pitches/mine | ip=127.0.0.1
+2026-05-28 11:57:23 | INFO     | getspons.main | ← OPTIONS /api/mediakit/saved | status=200 | 561.8ms
+2026-05-28 11:57:24 | INFO     | getspons.main | ← OPTIONS /api/pitches/mine | status=200 | 1291.0ms
+2026-05-28 11:57:24 | INFO     | getspons.main | → GET /api/mediakit/saved | ip=127.0.0.1
+2026-05-28 11:57:24 | INFO     | getspons.main | → GET /api/profile/me | ip=127.0.0.1
+2026-05-28 11:57:24 | INFO     | getspons.main | → GET /api/pitches/mine | ip=127.0.0.1
+2026-05-28 11:57:24 | DEBUG    | getspons.cache | Cache MISS | key=mediakit_328700f9-7a2a-4f11-b526-6fade20300f4
+2026-05-28 11:57:25 | DEBUG    | getspons.cache | Cache SET | key=mediakit_328700f9-7a2a-4f11-b526-6fade20300f4 | ttl=300s
+2026-05-28 11:57:25 | INFO     | getspons.main | ← GET /api/mediakit/saved | status=200 | 946.2ms
+2026-05-28 11:57:25 | INFO     | getspons.main | ← GET /api/pitches/mine | status=200 | 973.7ms
+2026-05-28 11:57:26 | DEBUG    | getspons.cache | Cache MISS | key=profile_328700f9-7a2a-4f11-b526-6fade20300f4
+2026-05-28 11:57:26 | INFO     | getspons.profile | Profile fetch | user_id=328700f9-7a2a-4f11-b526-6fade20300f4
+2026-05-28 11:57:26 | DEBUG    | getspons.cache | Cache SET | key=profile_328700f9-7a2a-4f11-b526-6fade20300f4 | ttl=300s
+2026-05-28 11:57:26 | WARNING  | getspons.main | ← GET /api/profile/me | status=200 | 2483.1ms  ⚠ SLOW REQUEST
+2026-05-28 11:57:37 | INFO     | getspons.main | → GET /api/pitches/mine | ip=127.0.0.1
+2026-05-28 11:57:38 | INFO     | getspons.main | ← GET /api/pitches/mine | status=200 | 1267.5ms
+2026-05-28 11:57:53 | INFO     | getspons.main | → OPTIONS /api/pitches/59aa5a92-1234-4cdc-805c-2a6de59df151 | ip=127.0.0.1
+2026-05-28 11:57:53 | INFO     | getspons.main | ← OPTIONS /api/pitches/59aa5a92-1234-4cdc-805c-2a6de59df151 | status=200 | 1.1ms
+2026-05-28 11:57:53 | INFO     | getspons.main | → PATCH /api/pitches/59aa5a92-1234-4cdc-805c-2a6de59df151 | ip=127.0.0.1
+2026-05-28 11:57:54 | INFO     | getspons.pitch | Pitch status updated | pitch_id=59aa5a92-1234-4cdc-805c-2a6de59df151 | new_status=sent | user_id=328700f9-7a2a-4f11-b526-6fade20300f4
+2026-05-28 11:57:54 | INFO     | getspons.main | ← PATCH /api/pitches/59aa5a92-1234-4cdc-805c-2a6de59df151 | status=200 | 1150.6ms
+2026-05-28 11:57:54 | INFO     | getspons.main | → GET /api/pitches/mine | ip=127.0.0.1
+2026-05-28 11:57:54 | INFO     | getspons.main | ← GET /api/pitches/mine | status=200 | 277.4ms
+2026-05-28 11:58:02 | INFO     | getspons.main | → PATCH /api/pitches/59aa5a92-1234-4cdc-805c-2a6de59df151 | ip=127.0.0.1
+2026-05-28 11:58:04 | INFO     | getspons.pitch | Pitch status updated | pitch_id=59aa5a92-1234-4cdc-805c-2a6de59df151 | new_status=replied | user_id=328700f9-7a2a-4f11-b526-6fade20300f4
+2026-05-28 11:58:04 | INFO     | getspons.main | ← PATCH /api/pitches/59aa5a92-1234-4cdc-805c-2a6de59df151 | status=200 | 1076.6ms
+2026-05-28 11:58:04 | INFO     | getspons.main | → GET /api/pitches/mine | ip=127.0.0.1
+2026-05-28 11:58:04 | INFO     | getspons.main | ← GET /api/pitches/mine | status=200 | 350.2ms
+2026-05-28 11:59:17 | INFO     | getspons.main | → GET /api/profile/me | ip=127.0.0.1
+2026-05-28 11:59:17 | INFO     | getspons.main | → GET /api/mediakit/saved | ip=127.0.0.1
+2026-05-28 11:59:17 | INFO     | getspons.main | → GET /api/pitches/mine | ip=127.0.0.1
+2026-05-28 11:59:18 | DEBUG    | getspons.cache | Cache HIT | key=profile_328700f9-7a2a-4f11-b526-6fade20300f4
+2026-05-28 11:59:18 | DEBUG    | getspons.cache | Cache HIT | key=mediakit_328700f9-7a2a-4f11-b526-6fade20300f4
+2026-05-28 11:59:18 | INFO     | getspons.main | ← GET /api/profile/me | status=200 | 1482.2ms
+2026-05-28 11:59:18 | INFO     | getspons.main | ← GET /api/mediakit/saved | status=200 | 1251.1ms
+2026-05-28 11:59:19 | INFO     | getspons.main | ← GET /api/pitches/mine | status=200 | 1911.0ms
+2026-05-28 11:59:22 | INFO     | getspons.main | → GET /api/pitches/mine | ip=127.0.0.1
+2026-05-28 11:59:22 | INFO     | getspons.main | ← GET /api/pitches/mine | status=200 | 231.7ms
+2026-05-28 11:59:25 | INFO     | getspons.main | → GET /api/profile/me | ip=127.0.0.1
+2026-05-28 11:59:27 | DEBUG    | getspons.cache | Cache HIT | key=profile_328700f9-7a2a-4f11-b526-6fade20300f4
+2026-05-28 11:59:27 | INFO     | getspons.main | ← GET /api/profile/me | status=200 | 1326.3ms
+2026-05-28 11:59:29 | INFO     | getspons.main | → POST /api/profile/save | ip=127.0.0.1
+2026-05-28 11:59:30 | INFO     | getspons.profile | Profile save attempt | user_id=328700f9-7a2a-4f11-b526-6fade20300f4
+2026-05-28 11:59:31 | DEBUG    | getspons.cache | Cache DELETE | key=profile_328700f9-7a2a-4f11-b526-6fade20300f4
+2026-05-28 11:59:31 | INFO     | getspons.profile | Profile saved successfully | user_id=328700f9-7a2a-4f11-b526-6fade20300f4
+2026-05-28 11:59:31 | INFO     | getspons.main | ← POST /api/profile/save | status=200 | 1202.7ms
+2026-05-28 11:59:34 | INFO     | getspons.main | → GET /api/profile/me | ip=127.0.0.1
+2026-05-28 11:59:34 | INFO     | getspons.main | → GET /api/mediakit/saved | ip=127.0.0.1
+2026-05-28 11:59:35 | INFO     | getspons.main | → GET /api/pitches/mine | ip=127.0.0.1
+2026-05-28 11:59:35 | DEBUG    | getspons.cache | Cache HIT | key=mediakit_328700f9-7a2a-4f11-b526-6fade20300f4
+2026-05-28 11:59:35 | INFO     | getspons.main | ← GET /api/mediakit/saved | status=200 | 563.4ms
+2026-05-28 11:59:35 | DEBUG    | getspons.cache | Cache MISS | key=profile_328700f9-7a2a-4f11-b526-6fade20300f4
+2026-05-28 11:59:35 | INFO     | getspons.profile | Profile fetch | user_id=328700f9-7a2a-4f11-b526-6fade20300f4
+2026-05-28 11:59:35 | INFO     | getspons.main | ← GET /api/pitches/mine | status=200 | 491.0ms
+2026-05-28 11:59:36 | DEBUG    | getspons.cache | Cache SET | key=profile_328700f9-7a2a-4f11-b526-6fade20300f4 | ttl=300s
+2026-05-28 11:59:36 | INFO     | getspons.main | ← GET /api/profile/me | status=200 | 1305.1ms
+2026-05-28 11:59:44 | INFO     | getspons.main | → GET /api/brands/ | ip=127.0.0.1
+2026-05-28 11:59:44 | DEBUG    | getspons.cache | Cache HIT | key=brands_list_None_None
+2026-05-28 11:59:44 | INFO     | getspons.main | ← GET /api/brands/ | status=200 | 244.4ms
+2026-05-28 11:59:47 | INFO     | getspons.main | → OPTIONS /api/brands/736e9880-6b8f-491b-9e43-fd69573ff333 | ip=127.0.0.1
+2026-05-28 11:59:48 | INFO     | getspons.main | ← OPTIONS /api/brands/736e9880-6b8f-491b-9e43-fd69573ff333 | status=200 | 11.8ms
+2026-05-28 11:59:48 | INFO     | getspons.main | → GET /api/brands/736e9880-6b8f-491b-9e43-fd69573ff333 | ip=127.0.0.1
+2026-05-28 11:59:48 | DEBUG    | getspons.cache | Cache MISS | key=brand_detail_736e9880-6b8f-491b-9e43-fd69573ff333
+2026-05-28 11:59:49 | INFO     | getspons.brands | Single brand fetched from DB | brand_id=736e9880-6b8f-491b-9e43-fd69573ff333
+2026-05-28 11:59:49 | DEBUG    | getspons.cache | Cache SET | key=brand_detail_736e9880-6b8f-491b-9e43-fd69573ff333 | ttl=600s
+2026-05-28 11:59:49 | INFO     | getspons.main | ← GET /api/brands/736e9880-6b8f-491b-9e43-fd69573ff333 | status=200 | 681.5ms
